@@ -11,9 +11,9 @@ import kafka.message.CompressionCodec;
  */
 public class LogRecord {
 
-    private String offset;
+    private long offset;
 
-    private int position;
+    private long position;
 
     private boolean isvalid;
 
@@ -23,19 +23,19 @@ public class LogRecord {
 
     private String content;
 
-    public String getOffset() {
+    public long getOffset() {
         return offset;
     }
 
-    public void setOffset(String offset) {
+    public void setOffset(long offset) {
         this.offset = offset;
     }
 
-    public int getPosition() {
+    public long getPosition() {
         return position;
     }
 
-    public void setPosition(int position) {
+    public void setPosition(long position) {
         this.position = position;
     }
 
@@ -69,5 +69,16 @@ public class LogRecord {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    @Override public String toString() {
+        return new StringBuffer("[")
+                .append(" offset: ").append(offset)
+                .append(" position: ").append(position)
+                .append(" isvalid: ").append(isvalid)
+                .append(" encodc: ").append(compresscodec)
+                .append(" contentSize: ").append(contentSize)
+                .append(" content: ").append(content).toString();
+
     }
 }

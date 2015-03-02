@@ -27,7 +27,7 @@ public class LogController {
     @RequestMapping(value = "/logs", method = RequestMethod.GET)
     public String getFileContent(ModelMap modelMap) {
         final List<String> logLists = handleLogSegmentService
-                .dumpLog(new File("/tmp/kafka-logs/build-0/00000000000000000000.log"),0,10);
+                .dumpLog(new File("/tmp/kafka-logs/build-0/00000000000000000000.log"),0,20);
         modelMap.put("logs", logLists);
         return "logs";
     }

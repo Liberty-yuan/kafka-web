@@ -6,6 +6,7 @@ import kafka.message.MessageAndOffset;
 import kafka.message.MessageSet;
 import kafka.message.NoCompressionCodec;
 import me.bliss.kafka.web.constant.ServiceContants;
+import me.bliss.kafka.web.model.LogRecord;
 import scala.collection.Iterator;
 
 import java.io.File;
@@ -46,28 +47,12 @@ public class HandleLogSegmentService {
         long validBytes = 0l;
         while (iterator.hasNext()) {
             final MessageAndOffset messageAndOffset = iterator.next();
-            final StringBuffer record = new StringBuffer();
+            final LogRecord logRecord = new LogRecord();
             Message message = messageAndOffset.message();
-            if (message.compressionCodec().codec() == NoCompressionCodec.codec()
-                && messageAndOffset.offset() != lastOffset + 1) {
-                //不连续的消息
-//                Map<Long, Long> nonConsecutivePairsSeq = nonConsecutivePairsForLogFilesMap
-//                                                                 .get(file.getAbsolutePath())
-//                                                         == null ?
-//                        new HashMap<Long, Long>() :
-//                        nonConsecutivePairsForLogFilesMap.get(file.getAbsolutePath());
-//                nonConsecutivePairsSeq.put(lastOffset, messageAndOffset.offset());
-//                nonConsecutivePairsForLogFilesMap
-//                        .put(file.getAbsolutePath(), nonConsecutivePairsSeq);
-            }
+
+            getNonConsecutivePairs(file,messageAndOffset,lastOffset);
+
             lastOffset = messageAndOffset.offset();
-
-            record.append("offset: ").append(messageAndOffset.offset())
-                    .append(" position: ").append(validBytes)
-                    .append(" isvalid: ").append(message.isValid())
-                    .append(" payloadsize: ").append(message.payloadSize())
-                    .append(" compresscodec: ").append(message.compressionCodec());
-
             if (message.hasKey()) {
                 System.out.print(" keySize: " + message.keySize());
             }
@@ -75,8 +60,15 @@ public class HandleLogSegmentService {
             String payload = messageAndOffset.message().isNull() ?
                     null :
                     decodeByteBuffer(messageAndOffset.message().payload());
-            record.append("payload").append(payload);
-            result.add(record.toString());
+
+            logRecord.setOffset(messageAndOffset.offset());
+            logRecord.setPosition(validBytes);
+            logRecord.setIsvalid(message.isValid());
+            logRecord.setContentSize(message.payloadSize());
+            logRecord.setCompresscodec(message.compressionCodec());
+            logRecord.setContent(payload);
+
+            result.add(logRecord.toString());
             validBytes += MessageSet.entrySize(messageAndOffset.message());
         }
         final long trailingBytes = fileMessageSet.sizeInBytes() - validBytes;
@@ -127,6 +119,22 @@ public class HandleLogSegmentService {
         //byteBuffer.flip();
         final char[] array = charset.decode(byteBuffer).array();
         return new String(array);
+    }
+
+    private Map<String,Map<Long,Long>> getNonConsecutivePairs(File file,MessageAndOffset messageAndOffset,long lastOffset){
+        final HashMap<String, Map<Long, Long>> nonConsecutivePairsForLogFilesMap = new HashMap<String, Map<Long, Long>>();
+        if (messageAndOffset.message().compressionCodec().codec() == NoCompressionCodec.codec()
+            && messageAndOffset.offset() != lastOffset + 1) {
+            //不连续的消息
+            Map<Long, Long> nonConsecutivePairsSeq = nonConsecutivePairsForLogFilesMap.get(file.getAbsolutePath())== null ?
+                    new HashMap<Long, Long>() :
+                    nonConsecutivePairsForLogFilesMap.get(file.getAbsolutePath());
+            nonConsecutivePairsSeq.put(lastOffset, messageAndOffset.offset());
+            nonConsecutivePairsForLogFilesMap
+                    .put(file.getAbsolutePath(), nonConsecutivePairsSeq);
+        }
+
+        return nonConsecutivePairsForLogFilesMap;
     }
 
 }
