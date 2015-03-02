@@ -1,13 +1,11 @@
 package me.bliss.kafka.web.service;
 
-import kafka.log.FileMessageSet;
-import kafka.log.Log;
-import kafka.log.OffsetIndex;
-import kafka.log.OffsetPosition;
+import kafka.log.*;
 import kafka.message.Message;
 import kafka.message.MessageAndOffset;
 import kafka.message.MessageSet;
 import kafka.message.NoCompressionCodec;
+import me.bliss.kafka.web.constant.ServiceContants;
 import scala.collection.Iterator;
 
 import java.io.File;
@@ -27,19 +25,25 @@ import java.util.Map;
  */
 public class HandleLogSegmentService {
 
-
-
-
-
-    public List<String> dumpLog(File file,
-                                HashMap<String, Map<Long, Long>> nonConsecutivePairsForLogFilesMap) {
-        final ArrayList<String> result = new ArrayList<String>();
+    public List<String> dumpLog(File file,int startPos,int messageCount) {
         final FileMessageSet fileMessage = new FileMessageSet(file, false);
-        final FileMessageSet fileMessageSet = fileMessage.read(0, MessageSet.entrySize(fileMessage.iterator().next().message()) * 4);
-        //fileMessageSet.read(9,10);
+        final FileMessageSet fileMessageSet = fileMessage.read(startPos, MessageSet.entrySize(fileMessage.iterator().next().message()) * messageCount);
+
+        List<String> logs = readLog(file,fileMessageSet);
+
+        return logs;
+    }
+
+    public List<String> dumpLog(File file){
+        final FileMessageSet fileMessageSet = new FileMessageSet(file, false);
+        return readLog(file,fileMessageSet);
+    }
+
+    private List<String> readLog(File file,FileMessageSet fileMessageSet){
+        final Iterator<MessageAndOffset> iterator = fileMessageSet.iterator();
+        final ArrayList<String> result = new ArrayList<String>();
         long lastOffset = 0l;
         long validBytes = 0l;
-        final Iterator<MessageAndOffset> iterator = fileMessageSet.iterator();
         while (iterator.hasNext()) {
             final MessageAndOffset messageAndOffset = iterator.next();
             final StringBuffer record = new StringBuffer();
@@ -47,14 +51,14 @@ public class HandleLogSegmentService {
             if (message.compressionCodec().codec() == NoCompressionCodec.codec()
                 && messageAndOffset.offset() != lastOffset + 1) {
                 //不连续的消息
-                Map<Long, Long> nonConsecutivePairsSeq = nonConsecutivePairsForLogFilesMap
-                                                                 .get(file.getAbsolutePath())
-                                                         == null ?
-                        new HashMap<Long, Long>() :
-                        nonConsecutivePairsForLogFilesMap.get(file.getAbsolutePath());
-                nonConsecutivePairsSeq.put(lastOffset, messageAndOffset.offset());
-                nonConsecutivePairsForLogFilesMap
-                        .put(file.getAbsolutePath(), nonConsecutivePairsSeq);
+//                Map<Long, Long> nonConsecutivePairsSeq = nonConsecutivePairsForLogFilesMap
+//                                                                 .get(file.getAbsolutePath())
+//                                                         == null ?
+//                        new HashMap<Long, Long>() :
+//                        nonConsecutivePairsForLogFilesMap.get(file.getAbsolutePath());
+//                nonConsecutivePairsSeq.put(lastOffset, messageAndOffset.offset());
+//                nonConsecutivePairsForLogFilesMap
+//                        .put(file.getAbsolutePath(), nonConsecutivePairsSeq);
             }
             lastOffset = messageAndOffset.offset();
 
@@ -81,10 +85,6 @@ public class HandleLogSegmentService {
                     file.getName());
         }
         return result;
-    }
-
-    private void readLog(){
-
     }
 
 
@@ -123,7 +123,7 @@ public class HandleLogSegmentService {
         return result;
     }
     private String decodeByteBuffer(ByteBuffer byteBuffer) {
-        final Charset charset = Charset.forName("UTF-8");
+        final Charset charset = Charset.forName(ServiceContants.MESSAGE_ENCODE);
         //byteBuffer.flip();
         final char[] array = charset.decode(byteBuffer).array();
         return new String(array);

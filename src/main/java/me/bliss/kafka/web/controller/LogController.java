@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -29,8 +27,7 @@ public class LogController {
     @RequestMapping(value = "/logs", method = RequestMethod.GET)
     public String getFileContent(ModelMap modelMap) {
         final List<String> logLists = handleLogSegmentService
-                .dumpLog(new File("/tmp/kafka-logs/build-0/00000000000000000000.log"),
-                        new HashMap<String, Map<Long, Long>>());
+                .dumpLog(new File("/tmp/kafka-logs/build-0/00000000000000000000.log"),0,10);
         modelMap.put("logs", logLists);
         return "logs";
     }
