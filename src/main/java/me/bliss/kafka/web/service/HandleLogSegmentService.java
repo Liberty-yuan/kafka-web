@@ -30,9 +30,7 @@ public class HandleLogSegmentService {
         final FileMessageSet fileMessage = new FileMessageSet(file, false);
         final FileMessageSet fileMessageSet = fileMessage.read(startPos, MessageSet.entrySize(fileMessage.iterator().next().message()) * messageCount);
 
-        List<String> logs = readLog(file,fileMessageSet);
-
-        return logs;
+        return readLog(file,fileMessageSet);
     }
 
     public List<String> dumpLog(File file){

@@ -1,0 +1,14 @@
+#parse("/layout/head.vm")
+
+#set($ids = $brokers.ids)
+#set($topics = $brokers.topics)
+
+<hr>
+<h3>broker attribute</h3>
+$ids
+<hr>
+<h3>broker topics</h3>
+$topics
+<hr>
+
+#parse("/layout/foot.vm")

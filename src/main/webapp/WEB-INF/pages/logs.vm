@@ -1,3 +1,7 @@
+#parse("/layout/head.vm")
+
 #foreach($log in $logs)
     $log <br>
 #end
+
+#parse("/layout/foot.vm")

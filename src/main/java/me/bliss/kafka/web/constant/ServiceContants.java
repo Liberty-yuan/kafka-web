@@ -10,4 +10,12 @@ package me.bliss.kafka.web.constant;
 public class ServiceContants {
 
     public final static String MESSAGE_ENCODE = "UTF-8";
+
+    public final static String KAFKA_BROKERS_PATH = "/brokers";
+
+    public final static String KAFKA_BROKERS_IDS_PATH = "/brokers/ids";
+
+    public final static String KAFKA_BROKERS_TOPIC_PATH = "/brokers/topics";
+
+
 }
