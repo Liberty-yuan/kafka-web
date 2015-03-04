@@ -1,6 +1,5 @@
 package me.bliss.kafka.web.service;
 
-import com.google.gson.Gson;
 import me.bliss.kafka.web.constant.ServiceContants;
 import me.bliss.kafka.web.model.Broker;
 import me.bliss.kafka.web.model.Topic;
@@ -27,7 +26,7 @@ public class ZookeeperService {
 
     private static int port = 2181;
 
-    private static int timeout = 10000;
+    private static int timeout = 60000;
 
     private static ZooKeeper zooKeeper = null;
 
@@ -101,12 +100,11 @@ public class ZookeeperService {
         return result;
     }
 
-    public static ServiceResult getBrokers() {
+    public static ServiceResult<Map<String,Object>> getBrokers() {
         final ServiceResult<Map<String, Object>> serviceResult = new ServiceResult<Map<String, Object>>();
         final HashMap<String, Object> brokers = new HashMap<String, Object>();
         final HashMap<String, Broker> ids = new HashMap<String, Broker>();
         final List<Topic> topics = new ArrayList<Topic>();
-        final Gson gson = new Gson();
         final ObjectMapper mapper = new ObjectMapper();
         try {
             final List<String> idsChildren = zooKeeper
@@ -132,16 +130,19 @@ public class ZookeeperService {
 
                 final Iterator<String> fieldNames = root.findPath("partitions").getFieldNames();
 
+                int replication = 0;
                 while (fieldNames.hasNext()) {
                     final String field = fieldNames.next();
-                    accumulateBrokerPartitions(root.findPath("partitions").get(field).toString(),brokerPartitions);
-                    partitions.put(field, root.findPath("partitions").get(field).toString());
+                    final String partition = root.findPath("partitions").get(field).toString();
+                    accumulateBrokerPartitions(partition, brokerPartitions);
+                    partitions.put(field, removeStartAndEndChar(partition));
+                    replication = judgeReplication(partition,replication);
                 }
 
                 topic.setName(topicChild);
                 topic.setPartitions(partitions);
                 topic.setVersion(root.findPath("partitions").getTextValue());
-                topic.setReplication(partitions.size());
+                topic.setReplication(replication);
                 topic.setBrokerPartitions(brokerPartitions);
 
                 topics.add(topic);
@@ -159,13 +160,27 @@ public class ZookeeperService {
         return serviceResult;
     }
 
-    private static void accumulateBrokerPartitions(String field,Map<String,Integer> brokersPartitions){
-        if (brokersPartitions.containsKey(field)){
-            int count = brokersPartitions.get(field);
-            brokersPartitions.put(field,count+1);
-            return;
+    private static String removeStartAndEndChar(String partition){
+        return partition.substring(1,partition.length()-1);
+    }
+
+    private static int judgeReplication(String parition,int replication){
+        final int length = parition.split(",").length;
+        return length > replication ? length : replication;
+    }
+
+    private static void accumulateBrokerPartitions(String data,Map<String,Integer> brokersPartitions){
+        final String field =removeStartAndEndChar(data);
+        final String[] keys = field.split(",");
+        for (String key : keys){
+            if (brokersPartitions.containsKey(key)){
+                int count = brokersPartitions.get(key);
+                brokersPartitions.put(key,count+1);
+            }else {
+                brokersPartitions.put(key, 1);
+            }
         }
-        brokersPartitions.put(field,1);
+
     }
 
     private static String convertListToString(List<String> lists) {

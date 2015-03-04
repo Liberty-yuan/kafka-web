@@ -7,7 +7,7 @@
         <i class="block layout icon"></i>
         Brokers
     </a>
-    <a class="item" href="/brokers">
+    <a class="item" href="/topics">
         <i class="block layout icon"></i>
         Topics
     </a>

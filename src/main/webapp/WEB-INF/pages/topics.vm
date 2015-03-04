@@ -1,7 +1,5 @@
 #parse("/layout/head.vm")
 #parse("/layout/sidebar.vm")
-#set($ids = $brokers.ids)
-#set($topics = $brokers.topics)
 
 <style>
     .container .row{
@@ -17,16 +15,15 @@
         <div class="col-md-3 ui-left-panel">
             <div class="ui inverted segment">
                 <div class="ui inverted accordion">
-                    #foreach($id in $ids.keySet())
+                    #foreach($topic in $topics)
                         <div class="title">
                             <i class="dropdown icon"></i>
-                            Broker $id
+                            Topic:  $topic.name
                         </div>
                         <div class="content" style="padding-left: 20px;">
-                            <p>timestamp: $ids.get($id).timestamp</p>
-                            <p>host: $ids.get($id).host</p>
-                            <p>port: $ids.get($id).port</p>
-                            <p>version: $ids.get($id).version</p>
+                            <p>Topic summary</p>
+                            <p>Partitions by Broker</p>
+                            <p>Partitions Information</p>
                         </div>
                     #end
                 </div>

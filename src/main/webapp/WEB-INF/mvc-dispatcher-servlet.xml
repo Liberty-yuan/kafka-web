@@ -41,7 +41,19 @@
         <property name="numberToolAttribute" value="numberTool" />
         <property name="exposeRequestAttributes" value="true" />
         <property name="exposeSessionAttributes" value="true" />
+        <property name="toolboxConfigLocation" value="/WEB-INF/velocity/toolbox.xml"/>
     </bean>
 
+    <bean name="velocityView"
+        class="org.springframework.web.servlet.view.velocity.VelocityView">
+        <property name="toolAttributes">
+            <map>
+                <entry key="mapUtils" value="me.bliss.kafka.web.utils.MapUtils" />
+            </map>
+        </property>
+        <property name="url" value="/" />
+    </bean>
+
+    <!--<bean id="mapUtils" class="me.bliss.kafka.web.utils.MapUtils"/>-->
     <bean id="handleLogSegmentService" class="me.bliss.kafka.web.service.HandleLogSegmentService"/>
 </beans>
