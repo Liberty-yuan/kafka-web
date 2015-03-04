@@ -1,5 +1,6 @@
 package me.bliss.kafka.web.controller;
 
+import me.bliss.kafka.web.model.LogRecord;
 import me.bliss.kafka.web.service.HandleLogSegmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,8 +27,8 @@ public class LogController {
 
     @RequestMapping(value = "/logs", method = RequestMethod.GET)
     public String getFileContent(ModelMap modelMap) {
-        final List<String> logLists = handleLogSegmentService
-                .dumpLog(new File("/tmp/kafka-logs/build-0/00000000000000000000.log"),0,20);
+        final List<LogRecord> logLists = handleLogSegmentService
+                .dumpLog(new File("/tmp/kafka-logs/build-0/00000000000000000000.log"),0,70);
         modelMap.put("logs", logLists);
         return "logs";
     }

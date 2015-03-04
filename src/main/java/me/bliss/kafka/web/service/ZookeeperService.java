@@ -1,9 +1,14 @@
 package me.bliss.kafka.web.service;
 
+import com.google.gson.Gson;
 import me.bliss.kafka.web.constant.ServiceContants;
+import me.bliss.kafka.web.model.Broker;
+import me.bliss.kafka.web.model.Topic;
 import me.bliss.kafka.web.result.ServiceResult;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 import java.util.*;
@@ -15,9 +20,10 @@ import java.util.*;
  * @version $Id: me.bliss.kafka.web.service, v 0.1 3/3/15
  *          Exp $
  */
+
 public class ZookeeperService {
 
-    private static String host = "127.0.0.1";
+    private static String host = "10.210.12.204";
 
     private static int port = 2181;
 
@@ -87,6 +93,7 @@ public class ZookeeperService {
         return result;
     }
 
+
     public static ServiceResult<List<String>> getChildren(String path) {
         final ServiceResult<List<String>> result = new ServiceResult<List<String>>();
 
@@ -94,24 +101,54 @@ public class ZookeeperService {
         return result;
     }
 
-    public static  ServiceResult getBrokers(){
-        final ServiceResult<Map<String, Map<String,String>>> serviceResult = new ServiceResult<Map<String, Map<String,String>>>();
-        final HashMap<String, Map<String,String>> brokers = new HashMap<String, Map<String,String>>();
-        final HashMap<String, String> ids = new HashMap<String, String>();
-        final HashMap<String, String> topics = new HashMap<String,String>();
+    public static ServiceResult getBrokers() {
+        final ServiceResult<Map<String, Object>> serviceResult = new ServiceResult<Map<String, Object>>();
+        final HashMap<String, Object> brokers = new HashMap<String, Object>();
+        final HashMap<String, Broker> ids = new HashMap<String, Broker>();
+        final List<Topic> topics = new ArrayList<Topic>();
+        final Gson gson = new Gson();
+        final ObjectMapper mapper = new ObjectMapper();
         try {
-            final List<String> idsChildren = zooKeeper.getChildren(ServiceContants.KAFKA_BROKERS_IDS_PATH, false);
-            for (String idsChild : idsChildren){
-                final byte[] bytes = zooKeeper.getData(ServiceContants.KAFKA_BROKERS_IDS_PATH+"/"+idsChild,false,null);
-                ids.put(idsChild,new String(bytes));
+            final List<String> idsChildren = zooKeeper
+                    .getChildren(ServiceContants.KAFKA_BROKERS_IDS_PATH, false);
+            for (String idsChild : idsChildren) {
+                final byte[] bytes = zooKeeper
+                        .getData(ServiceContants.KAFKA_BROKERS_IDS_PATH + "/" + idsChild, false,
+                                null);
+                ids.put(idsChild,mapper.readValue(new String(bytes), Broker.class));
+                //ids.put(idsChild, gson.fromJson(new String(bytes), Map.class));
             }
-            final List<String> topicsChildren = zooKeeper.getChildren(ServiceContants.KAFKA_BROKERS_TOPIC_PATH, false);
-            for (String topicChild : topicsChildren){
-                final byte[] bytes = zooKeeper.getData(ServiceContants.KAFKA_BROKERS_TOPIC_PATH+ "/" + topicChild, false, null);
-                topics.put(topicChild,new String(bytes));
+            final List<String> topicsChildren = zooKeeper
+                    .getChildren(ServiceContants.KAFKA_BROKERS_TOPIC_PATH, false);
+            for (String topicChild : topicsChildren) {
+                final byte[] bytes = zooKeeper
+                        .getData(ServiceContants.KAFKA_BROKERS_TOPIC_PATH + "/" + topicChild, false,
+                                null);
+                final JsonNode root = mapper.readTree(new String(bytes));
+                final HashMap<String, String> partitions = new HashMap<String, String>();
+                final HashMap<String, Integer> brokerPartitions = new HashMap<String, Integer>();
+                final Topic topic = new Topic();
+
+
+                final Iterator<String> fieldNames = root.findPath("partitions").getFieldNames();
+
+                while (fieldNames.hasNext()) {
+                    final String field = fieldNames.next();
+                    accumulateBrokerPartitions(root.findPath("partitions").get(field).toString(),brokerPartitions);
+                    partitions.put(field, root.findPath("partitions").get(field).toString());
+                }
+
+                topic.setName(topicChild);
+                topic.setPartitions(partitions);
+                topic.setVersion(root.findPath("partitions").getTextValue());
+                topic.setReplication(partitions.size());
+                topic.setBrokerPartitions(brokerPartitions);
+
+                topics.add(topic);
+
             }
-            brokers.put("ids",ids);
-            brokers.put("topics",topics);
+            brokers.put("ids", ids);
+            brokers.put("topics", topics);
             serviceResult.setSuccess(true);
             serviceResult.setResult(brokers);
         } catch (Exception e) {
@@ -122,12 +159,19 @@ public class ZookeeperService {
         return serviceResult;
     }
 
+    private static void accumulateBrokerPartitions(String field,Map<String,Integer> brokersPartitions){
+        if (brokersPartitions.containsKey(field)){
+            int count = brokersPartitions.get(field);
+            brokersPartitions.put(field,count+1);
+            return;
+        }
+        brokersPartitions.put(field,1);
+    }
 
-
-    private static String convertListToString(List<String> lists){
+    private static String convertListToString(List<String> lists) {
         final StringBuffer stringBuffer = new StringBuffer();
         final Iterator<String> iterator = lists.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             stringBuffer.append("/").append(iterator.next());
         }
         return stringBuffer.toString();

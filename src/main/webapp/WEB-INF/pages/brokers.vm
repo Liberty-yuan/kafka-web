@@ -1,14 +1,65 @@
 #parse("/layout/head.vm")
-
+#parse("/layout/sidebar.vm")
 #set($ids = $brokers.ids)
 #set($topics = $brokers.topics)
 
-<hr>
-<h3>broker attribute</h3>
-$ids
-<hr>
-<h3>broker topics</h3>
-$topics
-<hr>
+<style>
+    .container .row{
+        padding-top: 25px;
+    }
+
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3 ui-left-panel">
+            <div class="ui inverted segment">
+                <div class="ui inverted accordion">
+                    #foreach($id in $ids.keySet())
+                        <div class="title">
+                            <i class="dropdown icon"></i>
+                            Broker $id
+                        </div>
+                        <div class="content" style="padding-left: 20px;">
+                            <p>timestamp: $ids.get($id).timestamp</p>
+                            <p>host: $ids.get($id).host</p>
+                            <p>port: $ids.get($id).port</p>
+                            <p>version: $ids.get($id).version</p>
+                        </div>
+                    #end
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9 ui-right-panel">
+            <table class="ui inverted table">
+                <thead>
+                <tr>
+                    <th>topic</th>
+                    <th>partitions</th>
+                    <th>partitions in broker</th>
+                    <th>replication</th>
+                </tr>
+                </thead>
+                <tbody>
+                    #foreach($topic in $topics)
+                    <tr>
+                        <td>$topic.name</td>
+                        <td>$topic.partitions</td>
+                        <td>$topic.brokerPartitions</td>
+                        <td>$topic.replication</td>
+                    </tr>
+                    #end
+
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</div>
 
 #parse("/layout/foot.vm")
+<script>
+    $('.tabular.menu .item').tab();
+    $('.ui.accordion').accordion();
+</script>

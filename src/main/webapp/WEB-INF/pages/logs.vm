@@ -1,7 +1,29 @@
 #parse("/layout/head.vm")
 
-#foreach($log in $logs)
-    $log <br>
-#end
+#parse("/layout/sidebar.vm")
+<div class="container">
+    <table class="table table-condensed table-hover">
+        <tr>
+            <th>消息序号</th>
+            <th>消息起始位置</th>
+            <th>消息是否有效</th>
+            <th>消息压缩编码encodc</th>
+            <th>消息大小</th>
+            <th>消息内容</th>
+        </tr>
+        #foreach($log in $logs)
+            <tr>
+                <td>$log.offset</td>
+                <td>$log.position</td>
+                <td>$log.isvalid</td>
+                <td>$log.compresscodec</td>
+                <td>$log.contentSize</td>
+                <td>$log.content</td>
+            </tr>
+        #end
+    </table>
+
+
+</div>
 
 #parse("/layout/foot.vm")

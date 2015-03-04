@@ -9,16 +9,14 @@
     <!-- 可选的Bootstrap主题文件（一般不用引入） -->
     <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
 
-    <style>
-
-    </style>
+    <link rel="stylesheet" href="/assets/semantic.min.css">
 
 </head>
 <body>
 
+<!--
 <nav class="navbar navbar-inverse">
     <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                 <span class="sr-only">Toggle navigation</span>
@@ -29,7 +27,6 @@
             <a class="navbar-brand" href="#">KAFKA-WEB</a>
         </div>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li><a href="/logs">logs</a></li>
@@ -37,6 +34,28 @@
             <ul class="nav navbar-nav">
                 <li><a href="/brokers">brokers</a></li>
             </ul>
-        </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
+        </div>
+    </div>
 </nav>
+
+-->
+<!--
+<div class="ui menu">
+    <a class="active item">
+        <i class="home icon"></i> brokers
+    </a>
+    <a class="item">
+        <i class="mail icon"></i> logs
+    </a>
+    <div class="right menu">
+        <div class="item">
+            <div class="ui transparent icon input">
+                <input type="text" placeholder="Search...">
+                <i class="search link icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+
+

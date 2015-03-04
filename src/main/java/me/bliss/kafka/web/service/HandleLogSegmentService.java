@@ -26,21 +26,21 @@ import java.util.Map;
  */
 public class HandleLogSegmentService {
 
-    public List<String> dumpLog(File file,int startPos,int messageCount) {
+    public List<LogRecord> dumpLog(File file,int startPos,int messageCount) {
         final FileMessageSet fileMessage = new FileMessageSet(file, false);
         final FileMessageSet fileMessageSet = fileMessage.read(startPos, MessageSet.entrySize(fileMessage.iterator().next().message()) * messageCount);
 
         return readLog(file,fileMessageSet);
     }
 
-    public List<String> dumpLog(File file){
+    public List<LogRecord> dumpLog(File file){
         final FileMessageSet fileMessageSet = new FileMessageSet(file, false);
         return readLog(file,fileMessageSet);
     }
 
-    private List<String> readLog(File file,FileMessageSet fileMessageSet){
+    private List<LogRecord> readLog(File file,FileMessageSet fileMessageSet){
         final Iterator<MessageAndOffset> iterator = fileMessageSet.iterator();
-        final ArrayList<String> result = new ArrayList<String>();
+        final ArrayList<LogRecord> result = new ArrayList<LogRecord>();
         long lastOffset = 0l;
         long validBytes = 0l;
         while (iterator.hasNext()) {
@@ -66,7 +66,7 @@ public class HandleLogSegmentService {
             logRecord.setCompresscodec(message.compressionCodec());
             logRecord.setContent(payload);
 
-            result.add(logRecord.toString());
+            result.add(logRecord);
             validBytes += MessageSet.entrySize(messageAndOffset.message());
         }
         final long trailingBytes = fileMessageSet.sizeInBytes() - validBytes;

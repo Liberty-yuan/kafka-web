@@ -1,5 +1,6 @@
-<html>
-<body>
-	<h1>${message}</h1>
-</body>
-</html>
+#parse("/layout/head.vm")
+#parse("/layout/sidebar.vm")
+<div class="container">
+    <h1>welcome to kafka web</h1>
+</div>
+#parse("/layout/foot.vm")

@@ -12,8 +12,9 @@ import org.junit.Test;
  */
 public class ZookeeperServiceTest {
 
+
     @Test
-    public void testGetPath(){
+    public void testGetBroker(){
         ZookeeperService.getBrokers();
     }
 }
