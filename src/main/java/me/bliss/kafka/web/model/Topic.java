@@ -17,6 +17,8 @@ public class Topic {
 
     private int replication;
 
+    private int brokerSize;
+
     private Map<String,Integer> brokerPartitions;
 
     private Map<String,String> partitions;
@@ -51,6 +53,14 @@ public class Topic {
 
     public void setBrokerPartitions(Map<String, Integer> brokerPartitions) {
         this.brokerPartitions = brokerPartitions;
+    }
+
+    public int getBrokerSize() {
+        return brokerSize;
+    }
+
+    public void setBrokerSize(int brokerSize) {
+        this.brokerSize = brokerSize;
     }
 
     public Map<String, String> getPartitions() {

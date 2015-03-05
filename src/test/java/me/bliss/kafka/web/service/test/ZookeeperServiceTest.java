@@ -17,4 +17,9 @@ public class ZookeeperServiceTest {
     public void testGetBroker(){
         ZookeeperService.getBrokers();
     }
+
+    @Test
+    public void testGetTopicDetail(){
+        ZookeeperService.getTopicDetail("build");
+    }
 }

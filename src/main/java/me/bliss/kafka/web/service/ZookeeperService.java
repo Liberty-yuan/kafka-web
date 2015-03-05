@@ -92,7 +92,6 @@ public class ZookeeperService {
         return result;
     }
 
-
     public static ServiceResult<List<String>> getChildren(String path) {
         final ServiceResult<List<String>> result = new ServiceResult<List<String>>();
 
@@ -100,55 +99,17 @@ public class ZookeeperService {
         return result;
     }
 
-    public static ServiceResult<Map<String,Object>> getBrokers() {
+    public static ServiceResult<Map<String, Object>> getBrokers() {
         final ServiceResult<Map<String, Object>> serviceResult = new ServiceResult<Map<String, Object>>();
         final HashMap<String, Object> brokers = new HashMap<String, Object>();
-        final HashMap<String, Broker> ids = new HashMap<String, Broker>();
         final List<Topic> topics = new ArrayList<Topic>();
-        final ObjectMapper mapper = new ObjectMapper();
         try {
-            final List<String> idsChildren = zooKeeper
-                    .getChildren(ServiceContants.KAFKA_BROKERS_IDS_PATH, false);
-            for (String idsChild : idsChildren) {
-                final byte[] bytes = zooKeeper
-                        .getData(ServiceContants.KAFKA_BROKERS_IDS_PATH + "/" + idsChild, false,
-                                null);
-                ids.put(idsChild,mapper.readValue(new String(bytes), Broker.class));
-                //ids.put(idsChild, gson.fromJson(new String(bytes), Map.class));
-            }
             final List<String> topicsChildren = zooKeeper
                     .getChildren(ServiceContants.KAFKA_BROKERS_TOPIC_PATH, false);
             for (String topicChild : topicsChildren) {
-                final byte[] bytes = zooKeeper
-                        .getData(ServiceContants.KAFKA_BROKERS_TOPIC_PATH + "/" + topicChild, false,
-                                null);
-                final JsonNode root = mapper.readTree(new String(bytes));
-                final HashMap<String, String> partitions = new HashMap<String, String>();
-                final HashMap<String, Integer> brokerPartitions = new HashMap<String, Integer>();
-                final Topic topic = new Topic();
-
-
-                final Iterator<String> fieldNames = root.findPath("partitions").getFieldNames();
-
-                int replication = 0;
-                while (fieldNames.hasNext()) {
-                    final String field = fieldNames.next();
-                    final String partition = root.findPath("partitions").get(field).toString();
-                    accumulateBrokerPartitions(partition, brokerPartitions);
-                    partitions.put(field, removeStartAndEndChar(partition));
-                    replication = judgeReplication(partition,replication);
-                }
-
-                topic.setName(topicChild);
-                topic.setPartitions(partitions);
-                topic.setVersion(root.findPath("partitions").getTextValue());
-                topic.setReplication(replication);
-                topic.setBrokerPartitions(brokerPartitions);
-
-                topics.add(topic);
-
+                topics.add(handleTopic(topicChild));
             }
-            brokers.put("ids", ids);
+            brokers.put("ids", handleBroker());
             brokers.put("topics", topics);
             serviceResult.setSuccess(true);
             serviceResult.setResult(brokers);
@@ -160,23 +121,93 @@ public class ZookeeperService {
         return serviceResult;
     }
 
-    private static String removeStartAndEndChar(String partition){
-        return partition.substring(1,partition.length()-1);
+    public static ServiceResult<Topic> getTopicDetail(String name) {
+        final ServiceResult<Topic> result = new ServiceResult<Topic>();
+        try {
+            final Topic topic = handleTopic(name);
+            result.setResult(topic);
+            result.setSuccess(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
-    private static int judgeReplication(String parition,int replication){
+    public static ServiceResult<Map<String,Broker>> getBrokersDetail(){
+        final ServiceResult<Map<String, Broker>> result = new ServiceResult<Map<String, Broker>>();
+        try {
+            result.setResult(handleBroker());
+            result.setSuccess(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public static Map<String,Broker> handleBroker()
+            throws KeeperException, InterruptedException, IOException {
+        final HashMap<String, Broker> brokers = new HashMap<String, Broker>();
+        final ObjectMapper mapper = new ObjectMapper();
+        final List<String> idsChildren = zooKeeper
+                .getChildren(ServiceContants.KAFKA_BROKERS_IDS_PATH, false);
+        for (String idsChild : idsChildren) {
+            final byte[] bytes = zooKeeper
+                    .getData(ServiceContants.KAFKA_BROKERS_IDS_PATH + "/" + idsChild, false,
+                            null);
+            brokers.put(idsChild, mapper.readValue(new String(bytes), Broker.class));
+        }
+        return brokers;
+    }
+
+    private static Topic handleTopic(String topicName)
+            throws KeeperException, InterruptedException, IOException {
+        final byte[] bytes = zooKeeper
+                .getData(ServiceContants.KAFKA_BROKERS_TOPIC_PATH + "/" + topicName, false,
+                        null);
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode root = mapper.readTree(new String(bytes));
+        final HashMap<String, String> partitions = new HashMap<String, String>();
+        final HashMap<String, Integer> brokerPartitions = new HashMap<String, Integer>();
+        final Topic topic = new Topic();
+
+        final Iterator<String> fieldNames = root.findPath("partitions").getFieldNames();
+
+        int replication = 0;
+        while (fieldNames.hasNext()) {
+            final String field = fieldNames.next();
+            final String partition = root.findPath("partitions").get(field).toString();
+            accumulateBrokerPartitions(partition, brokerPartitions);
+            partitions.put(field, removeStartAndEndChar(partition));
+            replication = judgeReplication(partition, replication);
+        }
+
+        topic.setName(topicName);
+        topic.setPartitions(partitions);
+        topic.setVersion(root.findPath("partitions").getTextValue());
+        topic.setReplication(replication);
+        topic.setBrokerPartitions(brokerPartitions);
+
+        return topic;
+    }
+
+    private static String removeStartAndEndChar(String partition) {
+        return partition.substring(1, partition.length() - 1);
+    }
+
+    private static int judgeReplication(String parition, int replication) {
         final int length = parition.split(",").length;
         return length > replication ? length : replication;
     }
 
-    private static void accumulateBrokerPartitions(String data,Map<String,Integer> brokersPartitions){
-        final String field =removeStartAndEndChar(data);
+    private static void accumulateBrokerPartitions(String data,
+                                                   Map<String, Integer> brokersPartitions) {
+        final String field = removeStartAndEndChar(data);
         final String[] keys = field.split(",");
-        for (String key : keys){
-            if (brokersPartitions.containsKey(key)){
+        for (String key : keys) {
+            if (brokersPartitions.containsKey(key)) {
                 int count = brokersPartitions.get(key);
-                brokersPartitions.put(key,count+1);
-            }else {
+                brokersPartitions.put(key, count + 1);
+            } else {
                 brokersPartitions.put(key, 1);
             }
         }

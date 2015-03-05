@@ -1,7 +1,5 @@
 #parse("/layout/head.vm")
 #parse("/layout/sidebar.vm")
-#set($ids = $brokers.ids)
-#set($topics = $brokers.topics)
 
 <style>
     .container .row{
@@ -10,29 +8,57 @@
     .word-break{
         word-break: break-all;
     }
-
+    .font-12 {
+        font-size: 12px;
+    }
 </style>
 <div class="container">
     <div class="row">
         <div class="col-md-3 ui-left-panel">
             <div class="ui inverted segment">
                 <div class="ui inverted accordion">
-                    #foreach($id in $ids.keySet())
+                    #foreach($broker in $brokers.keySet())
+
                         <div class="title">
-                            <i class="dropdown icon"></i>
-                            Broker $id
+                            <i class="dropdown glyphicon glyphicon-leaf font-12"></i>
+                            Broker:&nbsp;&nbsp;&nbsp; $broker
                         </div>
                         <div class="content" style="padding-left: 20px;">
-                            <p>timestamp: $ids.get($id).timestamp</p>
-                            <p>host: $ids.get($id).host</p>
-                            <p>port: $ids.get($id).port</p>
-                            <p>version: $ids.get($id).version</p>
+                            <p>timestamp: $brokers.get($broker).timestamp</p>
+                            <p>host: $brokers.get($broker).host</p>
+                            <p>port: $brokers.get($broker).port</p>
+                            <p>version: $brokers.get($broker).version</p>
                         </div>
                     #end
                 </div>
             </div>
         </div>
         <div class="col-md-9 ui-right-panel">
+            <table class="ui inverted table">
+                <thead>
+                <tr>
+                    <th>id</th>
+                    <th>host</th>
+                    <th>port</th>
+                    <th>timestamp</th>
+                </tr>
+                </thead>
+                <tbody>
+                    #foreach($broker in $brokers.keySet())
+                    <tr class="$topic.brokerPartitions">
+                        <td>$broker</td>
+                        <td>
+                            $brokers.get($broker).host
+                        </td>
+                        <td>$brokers.get($broker).port</td>
+                        <td>$brokers.get($broker).timestamp</td>
+                    </tr>
+                    #end
+
+
+                </tbody>
+            </table>
+
             <table class="ui inverted table">
                 <thead>
                 <tr>
@@ -65,9 +91,5 @@
 
 #parse("/layout/foot.vm")
 <script>
-    (function(){
 
-    })();
-    $('.tabular.menu .item').tab();
-    $('.ui.accordion').accordion();
 </script>
