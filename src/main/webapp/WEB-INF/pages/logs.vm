@@ -34,16 +34,14 @@
                 </tr>
                 </thead>
                 <tbody>
-                    #foreach($log in $logs)
-                    <tr>
-                        <td>$log.offset</td>
-                        <td>$log.position</td>
-                        <td>$log.isvalid</td>
-                        <td>$log.compresscodec</td>
-                        <td>$log.contentSize</td>
-                        <td>$log.content</td>
+                    <tr v-repeat="logs">
+                        <td>{{offset}}</td>
+                        <td>{{position}}</td>
+                        <td>{{isvalid}}</td>
+                        <td>{{compresscodec}}</td>
+                        <td>{{contentSize}}</td>
+                        <td class="word-break" style="width: 50%;">{{content}}</td>
                     </tr>
-                    #end
                 </tbody>
             </table>
 
@@ -56,13 +54,13 @@
         new Vue({
             el: '.container',
             data: {
-
+                logs: []
             },
             methods: {
                 getDetail: function (name) {
                     var self = this;
                     JQ.get("/logs/get/"+name,'json').then(function(data){
-                        console.log(data);
+                        self.logs = data.result;
                     })
                 }
             }

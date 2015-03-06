@@ -15,6 +15,7 @@
         <i class="smile icon"></i>
         Logs
     </a>
+    <!--
     <a class="item">
         <i class="calendar icon"></i>
         History
@@ -39,4 +40,5 @@
         <i class="settings icon"></i>
         Settings
     </a>
+    -->
 </div>

@@ -54,6 +54,15 @@
         <property name="url" value="/" />
     </bean>
 
+    <bean id="configurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location">
+            <value>/WEB-INF/config.properties</value>
+        </property>
+        <property name="fileEncoding">
+            <value>utf-8</value>
+        </property>
+    </bean>
+
     <!--<bean id="mapUtils" class="me.bliss.kafka.web.utils.MapUtils"/>-->
     <bean id="handleLogSegmentService" class="me.bliss.kafka.web.service.HandleLogSegmentService"/>
 </beans>

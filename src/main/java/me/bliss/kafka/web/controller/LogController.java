@@ -5,6 +5,7 @@ import me.bliss.kafka.web.model.LogRecord;
 import me.bliss.kafka.web.result.FacadeResult;
 import me.bliss.kafka.web.service.HandleLogSegmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  *
@@ -30,18 +32,32 @@ public class LogController {
     @Autowired
     private HandleLogSegmentService handleLogSegmentService;
 
-    private String logRootPath = "/tmp/kafka-logs";
+    @Value("${logpath}")
+    private String logRootPath;
+
+    @RequestMapping(value = "/config", method = RequestMethod.GET)
+
+    @ResponseBody
+    public String getConfig() {
+        final Properties properties = new Properties();
+        //        try {
+        //            properties.load(this.getClass().getClassLoader().getResourceAsStream("config.properties"));
+        //        } catch (IOException e) {
+        //            e.printStackTrace();
+        //        }
+        return logRootPath;
+    }
 
     @RequestMapping(value = "/logs", method = RequestMethod.GET)
     public String getFilesList(ModelMap modelMap) {
         final File[] files = new File(logRootPath).listFiles();
         final ArrayList<String> filenames = new ArrayList<String>();
-        for (File file : files){
+        for (File file : files) {
             if (!file.getName().startsWith("_") && !file.getName().startsWith(".")) {
                 filenames.add(file.getName());
             }
         }
-        modelMap.put("filenames",filenames);
+        modelMap.put("filenames", filenames);
 
         return "logs";
     }
@@ -68,6 +84,10 @@ public class LogController {
 
     public void setHandleLogSegmentService(HandleLogSegmentService handleLogSegmentService) {
         this.handleLogSegmentService = handleLogSegmentService;
+    }
+
+    public void setLogRootPath(String logRootPath) {
+        this.logRootPath = logRootPath;
     }
 }
 

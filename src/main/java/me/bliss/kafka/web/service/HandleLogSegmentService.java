@@ -78,15 +78,14 @@ public class HandleLogSegmentService {
     }
 
 
-    public List<String> dumpIndex(File file, boolean verifyOnly,
-                                  Map<String, Map<Long, Long>> misMatchesForIndexFilesMap,
-                                  int maxMessageSize) {
+    public List<String> dumpIndex(File file, boolean verifyOnly,int maxMessageSize) {
         final List<String> result = new ArrayList<String>();
         long startOffset = Long.parseLong(file.getName().split("\\.")[0]);
         String logFileName = file.getAbsolutePath().split("\\.")[0] + Log.LogFileSuffix();
         File logFile = new File(logFileName);
         final FileMessageSet messageSet = new FileMessageSet(logFile, false);
         final OffsetIndex index = new OffsetIndex(file, startOffset, maxMessageSize);
+        final HashMap<String, Map<Long, Long>> nonConsecutivePairsForLogFilesMap = new HashMap<String, Map<Long, Long>>();
         for (int i = 0; i < index.entries(); i++) {
             final OffsetPosition entry = index.entry(i);
             final FileMessageSet partialFileMessageSet = messageSet
@@ -95,15 +94,15 @@ public class HandleLogSegmentService {
                     .head();
             if (messageAndOffset.offset() != entry.offset() + index.baseOffset()) {
                 final Map<Long, Long> misMatchesSeq =
-                        misMatchesForIndexFilesMap.get(file.getAbsolutePath()) == null ?
-                                misMatchesForIndexFilesMap.get(file.getAbsolutePath()) :
+                        nonConsecutivePairsForLogFilesMap.get(file.getAbsolutePath()) == null ?
+                                nonConsecutivePairsForLogFilesMap.get(file.getAbsolutePath()) :
                                 new HashMap<Long, Long>();
                 misMatchesSeq.put(entry.offset() + index.baseOffset(), messageAndOffset.offset());
-                misMatchesForIndexFilesMap.put(file.getAbsolutePath(), misMatchesSeq);
+                nonConsecutivePairsForLogFilesMap.put(file.getAbsolutePath(), misMatchesSeq);
             }
 
             if (entry.offset() == 0 && i > 0) {
-                return null;
+                return result;
             }
             if (!verifyOnly) {
                 result.add(String.format("offset: %d pasition: %d",
