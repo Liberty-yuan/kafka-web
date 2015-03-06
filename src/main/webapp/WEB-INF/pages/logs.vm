@@ -1,29 +1,72 @@
 #parse("/layout/head.vm")
 
 #parse("/layout/sidebar.vm")
+<style>
+    .container .row{
+        padding-top: 25px;
+    }
+</style>
 <div class="container">
-    <table class="table table-condensed table-hover">
-        <tr>
-            <th>消息序号</th>
-            <th>消息起始位置</th>
-            <th>消息是否有效</th>
-            <th>消息压缩编码encodc</th>
-            <th>消息大小</th>
-            <th>消息内容</th>
-        </tr>
-        #foreach($log in $logs)
-            <tr>
-                <td>$log.offset</td>
-                <td>$log.position</td>
-                <td>$log.isvalid</td>
-                <td>$log.compresscodec</td>
-                <td>$log.contentSize</td>
-                <td>$log.content</td>
-            </tr>
-        #end
-    </table>
 
+    <div class="row">
+        <div class="col-md-3 ui-left-panel">
+            <div class="ui inverted segment">
+                <div class="ui inverted accordion">
+                    #foreach($filename in $filenames)
+                        <div class="title" v-on="click: getDetail('$filename')">
+                            <i class="dropdown glyphicon glyphicon-leaf font-12"></i>
+                            Log:&nbsp;&nbsp;&nbsp; $filename
+                        </div>
+                    #end
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9 ui-right-panel">
+            <table class="ui inverted table">
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Offset</th>
+                    <th>Isvalid</th>
+                    <th>Encodc</th>
+                    <th>Size</th>
+                    <th>Content</th>
+                </tr>
+                </thead>
+                <tbody>
+                    #foreach($log in $logs)
+                    <tr>
+                        <td>$log.offset</td>
+                        <td>$log.position</td>
+                        <td>$log.isvalid</td>
+                        <td>$log.compresscodec</td>
+                        <td>$log.contentSize</td>
+                        <td>$log.content</td>
+                    </tr>
+                    #end
+                </tbody>
+            </table>
+
+        </div>
+    </div>
 
 </div>
+<script>
+    (function(JQ){
+        new Vue({
+            el: '.container',
+            data: {
 
+            },
+            methods: {
+                getDetail: function (name) {
+                    var self = this;
+                    JQ.get("/logs/get/"+name,'json').then(function(data){
+                        console.log(data);
+                    })
+                }
+            }
+        })
+    })($)
+</script>
 #parse("/layout/foot.vm")

@@ -63,7 +63,7 @@ public class HandleLogSegmentService {
             logRecord.setPosition(validBytes);
             logRecord.setIsvalid(message.isValid());
             logRecord.setContentSize(message.payloadSize());
-            logRecord.setCompresscodec(message.compressionCodec());
+            logRecord.setCompresscodec(message.compressionCodec().toString());
             logRecord.setContent(payload);
 
             result.add(logRecord);

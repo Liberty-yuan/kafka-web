@@ -1,7 +1,5 @@
 package me.bliss.kafka.web.model;
 
-import kafka.message.CompressionCodec;
-
 /**
  *
  *
@@ -19,7 +17,7 @@ public class LogRecord {
 
     private int contentSize;
 
-    private CompressionCodec compresscodec;
+    private String compresscodec;
 
     private String content;
 
@@ -55,11 +53,11 @@ public class LogRecord {
         this.contentSize = contentSize;
     }
 
-    public CompressionCodec getCompresscodec() {
+    public String getCompresscodec() {
         return compresscodec;
     }
 
-    public void setCompresscodec(CompressionCodec compresscodec) {
+    public void setCompresscodec(String compresscodec) {
         this.compresscodec = compresscodec;
     }
 

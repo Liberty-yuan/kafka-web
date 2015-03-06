@@ -183,13 +183,42 @@ public class ZookeeperService {
 
         topic.setName(topicName);
         topic.setPartitions(partitions);
-        topic.setVersion(root.findPath("partitions").getTextValue());
-        topic.setReplication(replication);
         topic.setBrokerPartitions(brokerPartitions);
+        topic.setBrokerPartitionsDetail(getPartitionsForBrokers(partitions));
+        topic.setReplication(replication);
 
         return topic;
     }
 
+    /**
+     *  get partitions for broker  eg: {100: [0,1,2]}
+     * @param partitions  partitions detail  eg: {0: "101,100", 1: "100,101"}
+     * @return
+     */
+    private static Map<String,List<String>> getPartitionsForBrokers(Map<String,String> partitions){
+        final HashMap<String, List<String>> result = new HashMap<String, List<String>>();
+        final Iterator<Map.Entry<String, String>> iterator = partitions.entrySet().iterator();
+        final ArrayList<String> brokersList = new ArrayList<String>();
+        while (iterator.hasNext()){
+            final Map.Entry<String, String> entry = iterator.next();
+            for (String partition : entry.getValue().split(",")){
+                if (!brokersList.contains(partition)) brokersList.add(partition);
+            }
+            for (String broker : brokersList){
+                final List<String> partitionList = result.get(broker) != null ? result.get(broker) : new ArrayList<String>();
+                partitionList.add(entry.getKey());
+                result.remove(broker);
+                result.put(broker,partitionList);
+            }
+        }
+        return result;
+    }
+
+    /**
+     *  remove start and end char for String
+     * @param partition
+     * @return
+     */
     private static String removeStartAndEndChar(String partition) {
         return partition.substring(1, partition.length() - 1);
     }
@@ -199,6 +228,13 @@ public class ZookeeperService {
         return length > replication ? length : replication;
     }
 
+    /**
+     *  accumulate one topic partitions sum
+     * @param data
+     * @param brokersPartitions
+     *
+     *
+     */
     private static void accumulateBrokerPartitions(String data,
                                                    Map<String, Integer> brokersPartitions) {
         final String field = removeStartAndEndChar(data);

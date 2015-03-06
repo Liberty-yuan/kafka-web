@@ -161,31 +161,20 @@
                         self.brokersNum = Object.keys(brokers).length;
                         self.topicOnBroker = Object.keys(topics.brokerPartitions).length;
                         var brokersRet = [];
-                        Object.keys(brokers).forEach(function(item){
-                            var partitionKeys = findKeys(item, topics.partitions);
+                        Object.keys(topics.brokerPartitionsDetail).forEach(function(item){
                             var params = {
                                 id: item,
-                                partitionsNum: partitionKeys.length,
-                                partitions: "("+partitionKeys.join(",")+")"
+                                partitionsNum: topics.brokerPartitionsDetail[item].length,
+                                partitions: "("+topics.brokerPartitionsDetail[item]+")"
                             }
-                            partitionKeys.length > 0 && brokersRet.push(params);
+                            topics.brokerPartitionsDetail[item].length > 0 && brokersRet.push(params);
                         });
                         self.brokers = brokersRet;
-                    })
+                    });
                 }
             }
-        })
+        });
 
-        function findKeys(brokerId, partitions) {
-            var res = [];
-            Object.keys(partitions).forEach(function(partitionId) {
-                var value = partitions[partitionId];
-                if(value.indexOf(brokerId) >= 0) {
-                    res.push(partitionId);
-                }
-            });
-            return res;
-        }
     })($);
 
 </script>

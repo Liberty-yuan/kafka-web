@@ -1,5 +1,6 @@
 package me.bliss.kafka.web.model;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,6 +21,8 @@ public class Topic {
     private int brokerSize;
 
     private Map<String,Integer> brokerPartitions;
+
+    private Map<String,List<String>> brokerPartitionsDetail;
 
     private Map<String,String> partitions;
 
@@ -61,6 +64,14 @@ public class Topic {
 
     public void setBrokerSize(int brokerSize) {
         this.brokerSize = brokerSize;
+    }
+
+    public Map<String, List<String>> getBrokerPartitionsDetail() {
+        return brokerPartitionsDetail;
+    }
+
+    public void setBrokerPartitionsDetail(Map<String, List<String>> brokerPartitionsDetail) {
+        this.brokerPartitionsDetail = brokerPartitionsDetail;
     }
 
     public Map<String, String> getPartitions() {
