@@ -2,11 +2,11 @@
 #parse("/layout/sidebar.vm")
 <div class="container">
     <div class="jumbotron">
-        <h1>Welcome to Kafka!!</h1>
+        <h3>Welcome to Kafka!!</h3>
 ##        <p>...</p>
-        <img src="https://t.alipayobjects.com/tfscom/T1ZudfXgJXXXXXXXXX.jpg">
+        <img src="https://t.alipayobjects.com/tfscom/T1ZudfXgJXXXXXXXXX.jpg" width="600px">
     </div>
 
-    <h1>welcome to kafka web</h1>
+##    <h1>welcome to kafka web</h1>
 </div>
 #parse("/layout/foot.vm")

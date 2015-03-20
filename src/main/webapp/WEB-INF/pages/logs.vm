@@ -2,7 +2,7 @@
 
 #parse("/layout/sidebar.vm")
 <style>
-    .container .row{
+    .container .row {
         padding-top: 25px;
     }
 </style>
@@ -12,11 +12,17 @@
         <div class="col-md-3 ui-left-panel">
             <div class="ui inverted segment">
                 <div class="ui inverted accordion">
-                    #foreach($filename in $filenames)
-                        <div class="title" v-on="click: getDetail('$filename')">
-                            <i class="dropdown glyphicon glyphicon-leaf font-12"></i>
-                            Log:&nbsp;&nbsp;&nbsp; $filename
+                    #foreach($topicFilename in $topicFilenames.entrySet())
+                        <div class="active title">
+                            <i class="dropdown icon"></i>
+                            $topicFilename.key
                         </div>
+                        <div class="active content" style="padding-left: 25px;cursor: pointer;">
+                            #foreach($filename in $topicFilename.value)
+                                <p v-on="click: getDetail('$filename')">$filename</p>
+                            #end
+                        </div>
+
                     #end
                 </div>
             </div>
@@ -34,23 +40,25 @@
                 </tr>
                 </thead>
                 <tbody>
-                    <tr v-repeat="logs">
-                        <td>{{offset}}</td>
-                        <td>{{position}}</td>
-                        <td>{{isvalid}}</td>
-                        <td>{{compresscodec}}</td>
-                        <td>{{contentSize}}</td>
-                        <td class="word-break" style="width: 50%;">{{content}}</td>
-                    </tr>
+                <tr v-repeat="logs">
+                    <td>{{offset}}</td>
+                    <td>{{position}}</td>
+                    <td>{{isvalid}}</td>
+                    <td>{{compresscodec}}</td>
+                    <td>{{contentSize}}</td>
+                    <td class="word-break" style="width: 50%;">{{content}}</td>
+                </tr>
                 </tbody>
             </table>
 
         </div>
     </div>
 
+    <div id='pagination' class='fn-clear'></div>
 </div>
 <script>
-    (function(JQ){
+    (function (JQ) {
+        $('.ui.accordion').accordion();
         new Vue({
             el: '.container',
             data: {
@@ -59,9 +67,11 @@
             methods: {
                 getDetail: function (name) {
                     var self = this;
-                    JQ.get("/logs/get/"+name,'json').then(function(data){
-                        self.logs = data.result;
-                    })
+                    self.logs = [];
+                    JQ.get("/logs/get/" + name, 'json')
+                            .then(function (data) {
+                                self.logs = data.result;
+                            })
                 }
             }
         })

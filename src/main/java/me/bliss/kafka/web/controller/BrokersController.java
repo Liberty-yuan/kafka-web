@@ -1,10 +1,10 @@
 package me.bliss.kafka.web.controller;
 
+import me.bliss.kafka.web.component.ZookeeperComponent;
 import me.bliss.kafka.web.model.Broker;
 import me.bliss.kafka.web.model.Topic;
 import me.bliss.kafka.web.result.FacadeResult;
 import me.bliss.kafka.web.result.ServiceResult;
-import me.bliss.kafka.web.service.ZookeeperService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +27,7 @@ public class BrokersController {
 
     @RequestMapping(value = "/brokers",method = RequestMethod.GET)
     public String detail(ModelMap modelMap){
-        final ServiceResult<Map<String,Object>> serviceResult = ZookeeperService.getBrokers();
+        final ServiceResult<Map<String,Object>> serviceResult = ZookeeperComponent.getBrokers();
         modelMap.put("brokers",serviceResult.getResult().get("ids"));
         modelMap.put("topics",serviceResult.getResult().get("topics"));
         return "brokers";
@@ -35,7 +35,7 @@ public class BrokersController {
 
     @RequestMapping(value = "/topics",method = RequestMethod.GET)
     public String topic(ModelMap modelMap){
-        final ServiceResult<Map<String,Object>> serviceResult = ZookeeperService.getBrokers();
+        final ServiceResult<Map<String,Object>> serviceResult = ZookeeperComponent.getBrokers();
         modelMap.put("topics",serviceResult.getResult().get("topics"));
         return "topics";
     }
@@ -44,8 +44,8 @@ public class BrokersController {
     @ResponseBody
     public FacadeResult getTopicDetail(@PathVariable String topic){
         final FacadeResult<Map<String, Object>> facadeResult = new FacadeResult<Map<String, Object>>();
-        final ServiceResult<Topic> topicsDetail = ZookeeperService.getTopicDetail(topic);
-        final ServiceResult<Map<String, Broker>> brokersDetail = ZookeeperService
+        final ServiceResult<Topic> topicsDetail = ZookeeperComponent.getTopicDetail(topic);
+        final ServiceResult<Map<String, Broker>> brokersDetail = ZookeeperComponent
                 .getBrokersDetail();
         final HashMap<String, Object> result = new HashMap<String, Object>();
         if (topicsDetail.isSuccess() && brokersDetail.isSuccess()){

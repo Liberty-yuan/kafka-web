@@ -64,5 +64,6 @@
     </bean>
 
     <!--<bean id="mapUtils" class="me.bliss.kafka.web.utils.MapUtils"/>-->
-    <bean id="handleLogSegmentService" class="me.bliss.kafka.web.service.HandleLogSegmentService"/>
+    <bean id="handleLogSegmentComponent" class="me.bliss.kafka.web.component.HandleLogSegmentComponent"/>
+    <bean id="kafkaLogService" class="me.bliss.kafka.web.service.KafkaLogService"></bean>
 </beans>

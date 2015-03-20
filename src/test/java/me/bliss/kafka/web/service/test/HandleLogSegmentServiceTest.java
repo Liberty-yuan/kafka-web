@@ -1,7 +1,7 @@
 package me.bliss.kafka.web.service.test;
 
 import junit.framework.Assert;
-import me.bliss.kafka.web.service.HandleLogSegmentService;
+import me.bliss.kafka.web.component.HandleLogSegmentComponent;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -17,17 +17,17 @@ import java.util.List;
  */
 public class HandleLogSegmentServiceTest extends Assert{
 
-    private static HandleLogSegmentService handleLogSegmentService;
+    private static HandleLogSegmentComponent handleLogSegmentComponent;
 
     @BeforeClass
-    public  static void before(){
-        handleLogSegmentService = new HandleLogSegmentService();
+    public static void before() {
+        handleLogSegmentComponent = new HandleLogSegmentComponent();
     }
 
     @Test
-    public void testDumpIndex(){
-        final List<String> logRecords = handleLogSegmentService.dumpIndex(
-                new File("/tmp/kafka-logs/build-0/00000000000000000000.index"),false,100);
+    public void testDumpIndex() {
+        final List<String> logRecords = handleLogSegmentComponent.dumpIndex(
+                new File("/tmp/kafka-logs/build-0/00000000000000000000.index"), false, 100);
         System.out.println(logRecords);
     }
 
