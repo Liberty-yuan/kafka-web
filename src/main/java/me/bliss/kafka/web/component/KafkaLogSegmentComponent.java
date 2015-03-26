@@ -29,7 +29,7 @@ import java.util.Map;
  * @version $Id: me.bliss.kafka.service, v 0.1 3/2/15
  *          Exp $
  */
-public class HandleLogSegmentComponent {
+public class KafkaLogSegmentComponent {
 
     public List<LogRecord> dumpLog(File file,int startPos,int messageCount){
         int entrySize = MessageSet.entrySize(new FileMessageSet(file).iterator().next().message());

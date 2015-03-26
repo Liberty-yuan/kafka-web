@@ -1,7 +1,7 @@
 package me.bliss.kafka.web.service;
 
 import kafka.log.Log;
-import me.bliss.kafka.web.component.HandleLogSegmentComponent;
+import me.bliss.kafka.web.component.KafkaLogSegmentComponent;
 import me.bliss.kafka.web.model.LogRecord;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class KafkaLogService {
     private String logRootPath;
 
     @Autowired
-    private HandleLogSegmentComponent handleLogSegmentComponent;
+    private KafkaLogSegmentComponent handleLogSegmentComponent;
 
     public Map<String, List<String>> getAllTopicFilenames() {
         final String[] logPaths = logRootPath.split(",");

@@ -1,7 +1,7 @@
 package me.bliss.kafka.web.service.test;
 
 import junit.framework.Assert;
-import me.bliss.kafka.web.component.HandleLogSegmentComponent;
+import me.bliss.kafka.web.component.KafkaLogSegmentComponent;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -17,11 +17,11 @@ import java.util.List;
  */
 public class HandleLogSegmentServiceTest extends Assert{
 
-    private static HandleLogSegmentComponent handleLogSegmentComponent;
+    private static KafkaLogSegmentComponent handleLogSegmentComponent;
 
     @BeforeClass
     public static void before() {
-        handleLogSegmentComponent = new HandleLogSegmentComponent();
+        handleLogSegmentComponent = new KafkaLogSegmentComponent();
     }
 
     @Test
