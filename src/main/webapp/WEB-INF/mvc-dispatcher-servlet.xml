@@ -66,5 +66,5 @@
     <!--<bean id="mapUtils" class="me.bliss.kafka.web.utils.MapUtils"/>-->
     <bean id="kafkaLogSegmentComponent" class="me.bliss.kafka.web.component.KafkaLogSegmentComponent"/>
     <bean id="kafkaLogService" class="me.bliss.kafka.web.service.KafkaLogService"></bean>
-    <bean id="kafkaDataHandleComponent" class="me.bliss.kafka.web.component.KafkaDataHandleComponent"></bean>
+    <bean id="kafkaSimpleConsumerLogicComponent" class="me.bliss.kafka.web.component.KafkaSimpleConsumerLogicComponent"></bean>
 </beans>
