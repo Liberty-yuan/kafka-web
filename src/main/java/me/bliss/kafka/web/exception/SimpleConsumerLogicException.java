@@ -1,4 +1,4 @@
-package me.bliss.kafka.web.component.exception;
+package me.bliss.kafka.web.exception;
 
 /**
  *
