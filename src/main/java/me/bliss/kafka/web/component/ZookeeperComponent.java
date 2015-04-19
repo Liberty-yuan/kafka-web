@@ -1,12 +1,11 @@
 package me.bliss.kafka.web.component;
 
+import me.bliss.kafka.web.component.model.Topic;
 import me.bliss.kafka.web.constant.ServiceContants;
-import me.bliss.kafka.web.model.Broker;
-import me.bliss.kafka.web.model.Topic;
+import me.bliss.kafka.web.component.model.ZKBroker;
 import me.bliss.kafka.web.result.ServiceResult;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
-import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ import java.util.*;
 
 public class ZookeeperComponent {
 
-    private static String host = "10.210.12.204";
+    private static String host = "zassets.ui.alipay.net";
 
     private static int port = 2181;
 
@@ -121,6 +120,43 @@ public class ZookeeperComponent {
         return serviceResult;
     }
 
+    public static List<String> getTopicsList() throws KeeperException, InterruptedException {
+        final List<String> children = zooKeeper
+                .getChildren(ServiceContants.KAFKA_BROKERS_TOPIC_PATH, new Watcher() {
+                    @Override public void process(WatchedEvent event) {
+                        System.out.println(
+                                "emit the get topic event " + event.getType() + " and state is "
+                                + event
+                                        .getState());
+                    }
+                });
+        return children;
+    }
+
+    public static Map<Integer,String> getBrokersList() throws KeeperException, InterruptedException {
+        Map<Integer, String> brokers = new HashMap<Integer, String>();
+        final List<String> brokerIds = zooKeeper
+                .getChildren(ServiceContants.KAFKA_BROKERS_IDS_PATH, new Watcher() {
+                    @Override public void process(WatchedEvent event) {
+                        System.out.println(
+                                "emit the get broker event " + event.getType() + " and state is "
+                                + event
+                                        .getState());
+                    }
+                });
+        for (String brokerId : brokerIds) {
+            final byte[] data = zooKeeper
+                    .getData(ServiceContants.KAFKA_BROKERS_IDS_PATH + "/" + brokerId,
+                            new Watcher() {
+                                @Override public void process(WatchedEvent event) {
+
+                                }
+                            }, null);
+            brokers.put(Integer.parseInt(brokerId), new String(data));
+        }
+        return brokers;
+    }
+
     public static ServiceResult<Topic> getTopicDetail(String name) {
         final ServiceResult<Topic> result = new ServiceResult<Topic>();
         try {
@@ -133,8 +169,8 @@ public class ZookeeperComponent {
         return result;
     }
 
-    public static ServiceResult<Map<String,Broker>> getBrokersDetail(){
-        final ServiceResult<Map<String, Broker>> result = new ServiceResult<Map<String, Broker>>();
+    public static ServiceResult<Map<String, ZKBroker>> getBrokersDetail() {
+        final ServiceResult<Map<String, ZKBroker>> result = new ServiceResult<Map<String, ZKBroker>>();
         try {
             result.setResult(handleBroker());
             result.setSuccess(true);
@@ -144,9 +180,9 @@ public class ZookeeperComponent {
         return result;
     }
 
-    public static Map<String,Broker> handleBroker()
+    public static Map<String, ZKBroker> handleBroker()
             throws KeeperException, InterruptedException, IOException {
-        final HashMap<String, Broker> brokers = new HashMap<String, Broker>();
+        final HashMap<String, ZKBroker> brokers = new HashMap<String, ZKBroker>();
         final ObjectMapper mapper = new ObjectMapper();
         final List<String> idsChildren = zooKeeper
                 .getChildren(ServiceContants.KAFKA_BROKERS_IDS_PATH, false);
@@ -154,40 +190,41 @@ public class ZookeeperComponent {
             final byte[] bytes = zooKeeper
                     .getData(ServiceContants.KAFKA_BROKERS_IDS_PATH + "/" + idsChild, false,
                             null);
-            brokers.put(idsChild, mapper.readValue(new String(bytes), Broker.class));
+            brokers.put(idsChild, mapper.readValue(new String(bytes), ZKBroker.class));
         }
         return brokers;
     }
 
     private static Topic handleTopic(String topicName)
             throws KeeperException, InterruptedException, IOException {
-        final byte[] bytes = zooKeeper
-                .getData(ServiceContants.KAFKA_BROKERS_TOPIC_PATH + "/" + topicName, false,
-                        null);
-        final ObjectMapper mapper = new ObjectMapper();
-        final JsonNode root = mapper.readTree(new String(bytes));
-        final HashMap<String, String> partitions = new HashMap<String, String>();
-        final HashMap<String, Integer> brokerPartitions = new HashMap<String, Integer>();
-        final Topic topic = new Topic();
-
-        final Iterator<String> fieldNames = root.findPath("partitions").getFieldNames();
-
-        int replication = 0;
-        while (fieldNames.hasNext()) {
-            final String field = fieldNames.next();
-            final String partition = root.findPath("partitions").get(field).toString();
-            accumulateBrokerPartitions(partition, brokerPartitions);
-            partitions.put(field, removeStartAndEndChar(partition));
-            replication = judgeReplication(partition, replication);
-        }
-
-        topic.setName(topicName);
-        topic.setPartitions(partitions);
-        topic.setBrokerPartitions(brokerPartitions);
-        topic.setBrokerPartitionsDetail(getPartitionsForBrokers(partitions));
-        topic.setReplication(replication);
-
-        return topic;
+//        final byte[] bytes = zooKeeper
+//                .getData(ServiceContants.KAFKA_BROKERS_TOPIC_PATH + "/" + topicName, false,
+//                        null);
+//        final ObjectMapper mapper = new ObjectMapper();
+//        final JsonNode root = mapper.readTree(new String(bytes));
+//        final HashMap<String, String> partitions = new HashMap<String, String>();
+//        final HashMap<String, Integer> brokerPartitions = new HashMap<String, Integer>();
+//        final Topic topic = new Topic();
+//
+//        final Iterator<String> fieldNames = root.findPath("partitions").getFieldNames();
+//
+//        int replication = 0;
+//        while (fieldNames.hasNext()) {
+//            final String field = fieldNames.next();
+//            final String partition = root.findPath("partitions").get(field).toString();
+//            accumulateBrokerPartitions(partition, brokerPartitions);
+//            partitions.put(field, removeStartAndEndChar(partition));
+//            replication = judgeReplication(partition, replication);
+//        }
+//
+//        topic.setName(topicName);
+//        topic.setPartitions(partitions);
+//        topic.setBrokerPartitions(brokerPartitions);
+//        topic.setBrokerPartitionsDetail(getPartitionsForBrokers(partitions));
+//        topic.setReplication(replication);
+//
+//        return topic;
+        return null;
     }
 
     /**
@@ -195,20 +232,24 @@ public class ZookeeperComponent {
      * @param partitions  partitions detail  eg: {0: "101,100", 1: "100,101"}
      * @return
      */
-    private static Map<String,List<String>> getPartitionsForBrokers(Map<String,String> partitions){
+    private static Map<String, List<String>> getPartitionsForBrokers(
+            Map<String, String> partitions) {
         final HashMap<String, List<String>> result = new HashMap<String, List<String>>();
         final Iterator<Map.Entry<String, String>> iterator = partitions.entrySet().iterator();
         final ArrayList<String> brokersList = new ArrayList<String>();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             final Map.Entry<String, String> entry = iterator.next();
-            for (String partition : entry.getValue().split(",")){
-                if (!brokersList.contains(partition)) brokersList.add(partition);
+            for (String partition : entry.getValue().split(",")) {
+                if (!brokersList.contains(partition)) {
+                    brokersList.add(partition);
+                }
             }
-            for (String broker : brokersList){
-                final List<String> partitionList = result.get(broker) != null ? result.get(broker) : new ArrayList<String>();
+            for (String broker : brokersList) {
+                final List<String> partitionList =
+                        result.get(broker) != null ? result.get(broker) : new ArrayList<String>();
                 partitionList.add(entry.getKey());
                 result.remove(broker);
-                result.put(broker,partitionList);
+                result.put(broker, partitionList);
             }
         }
         return result;

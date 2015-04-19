@@ -1,6 +1,7 @@
-package me.bliss.kafka.web.service.test;
+package me.bliss.kafka.web.component.test;
 
 import me.bliss.kafka.web.component.ZookeeperComponent;
+import org.apache.zookeeper.KeeperException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,12 +22,13 @@ public class ZookeeperComponentTest {
 
 
     @Test
-    public void testGetBroker(){
-        ZookeeperComponent.getBrokers();
-    }
+    public void testGetTopics(){
+        try {
+            ZookeeperComponent.getTopicsList();
+        } catch (KeeperException e) {
 
-    @Test
-    public void testGetTopicDetail(){
-        ZookeeperComponent.getTopicDetail("build");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

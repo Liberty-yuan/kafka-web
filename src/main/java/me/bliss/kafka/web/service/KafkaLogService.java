@@ -49,6 +49,7 @@ public class KafkaLogService {
                 filenames.put(topic, topicRepalications);
             }
         }
+
         System.out.println(ArrayUtils.toString(filenames));
         return filenames;
 

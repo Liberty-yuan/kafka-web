@@ -1,8 +1,8 @@
 package me.bliss.kafka.web.controller;
 
 import me.bliss.kafka.web.component.ZookeeperComponent;
-import me.bliss.kafka.web.model.Broker;
-import me.bliss.kafka.web.model.Topic;
+import me.bliss.kafka.web.component.model.Topic;
+import me.bliss.kafka.web.component.model.ZKBroker;
 import me.bliss.kafka.web.result.FacadeResult;
 import me.bliss.kafka.web.result.ServiceResult;
 import org.springframework.stereotype.Controller;
@@ -45,7 +45,7 @@ public class BrokersController {
     public FacadeResult getTopicDetail(@PathVariable String topic){
         final FacadeResult<Map<String, Object>> facadeResult = new FacadeResult<Map<String, Object>>();
         final ServiceResult<Topic> topicsDetail = ZookeeperComponent.getTopicDetail(topic);
-        final ServiceResult<Map<String, Broker>> brokersDetail = ZookeeperComponent
+        final ServiceResult<Map<String, ZKBroker>> brokersDetail = ZookeeperComponent
                 .getBrokersDetail();
         final HashMap<String, Object> result = new HashMap<String, Object>();
         if (topicsDetail.isSuccess() && brokersDetail.isSuccess()){
