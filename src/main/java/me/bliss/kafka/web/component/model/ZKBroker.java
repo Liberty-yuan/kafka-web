@@ -1,5 +1,9 @@
 package me.bliss.kafka.web.component.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  *
  *
@@ -14,6 +18,10 @@ public class ZKBroker {
     private int port;
 
     private String version;
+
+    private Date createDate;
+
+    private long timestamp;
 
     public String getHost() {
         return host;
@@ -37,5 +45,29 @@ public class ZKBroker {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public Date getCreateDate() {
+        if (createDate == null ){
+            SimpleDateFormat format = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+            try {
+                return format.parse(format.format(timestamp));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

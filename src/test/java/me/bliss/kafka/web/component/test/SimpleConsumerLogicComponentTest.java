@@ -2,7 +2,7 @@ package me.bliss.kafka.web.component.test;
 
 import junit.framework.Assert;
 import kafka.javaapi.consumer.SimpleConsumer;
-import me.bliss.kafka.web.component.SimpleConsumerLogicComponent;
+import me.bliss.kafka.web.component.SimpleConsumerComponent;
 import me.bliss.kafka.web.exception.SimpleConsumerLogicException;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.Before;
@@ -29,7 +29,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration("file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml")
+@ContextConfiguration(
+        "file:../../../../../../../../main/webapp/WEB-INF/spring/mvc-dispatcher-servlet.xml")
 public class SimpleConsumerLogicComponentTest extends Assert{
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -44,7 +45,7 @@ public class SimpleConsumerLogicComponentTest extends Assert{
     }
 
     @Autowired
-    private SimpleConsumerLogicComponent kafkaPartitionsLeaderComponent;
+    private SimpleConsumerComponent kafkaPartitionsLeaderComponent;
 
     private String host = "zassets.ui.alipay.net";
 
@@ -70,7 +71,7 @@ public class SimpleConsumerLogicComponentTest extends Assert{
     }
 
     @Test
-    public void testReadDataForPage(){
+    public void testReadDataForPage() {
         try {
             final SimpleConsumer simpleConsumer = kafkaPartitionsLeaderComponent
                     .getLeaderSimpleConsumer(host, port, topic, partition);
@@ -86,7 +87,7 @@ public class SimpleConsumerLogicComponentTest extends Assert{
     }
 
     @Test
-    public void testGetEarliestOffset(){
+    public void testGetEarliestOffset() {
         try {
             final long earliestOffset = kafkaPartitionsLeaderComponent
                     .getEarliestOffset(host, port, topic, partition);
@@ -97,7 +98,7 @@ public class SimpleConsumerLogicComponentTest extends Assert{
     }
 
     public void setKafkaPartitionsLeaderComponent(
-            SimpleConsumerLogicComponent kafkaPartitionsLeaderComponent) {
+            SimpleConsumerComponent kafkaPartitionsLeaderComponent) {
         this.kafkaPartitionsLeaderComponent = kafkaPartitionsLeaderComponent;
     }
 }

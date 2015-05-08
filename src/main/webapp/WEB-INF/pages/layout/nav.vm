@@ -1,0 +1,11 @@
+<div class="ui purple inverted menu">
+    <a class="active item">
+        <i class="home icon"></i> 主页
+    </a>
+    <a class="item">
+        <i class="mail icon"></i> TOPIC
+    </a>
+##    <a class="item">
+##        <i class="user icon"></i> 朋友们
+##    </a>
+</div>

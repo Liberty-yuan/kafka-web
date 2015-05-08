@@ -1,6 +1,8 @@
 package me.bliss.kafka.web.service.test;
 
-import me.bliss.kafka.web.service.TopicService;
+import me.bliss.kafka.web.component.model.ZKBroker;
+import me.bliss.kafka.web.service.BrokerService;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +12,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.List;
 
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -23,7 +27,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/spring/application.xml"})
-public class TopicServiceTest {
+public class BrokerServiceTest extends Assert{
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -31,27 +35,22 @@ public class TopicServiceTest {
 
     private MockMvc mockMvc;
 
-    @Autowired
-    private TopicService topicService;
-
     @Before
     public void setup() {
         this.mockMvc = webAppContextSetup(this.webApplicationContext).build();
     }
 
-    @Test
-    public void testGetAllTopics() {
-        topicService.getAllTopics();
-
-    }
+    @Autowired
+    private BrokerService brokerService;
 
     @Test
-    public void testGetMessage() {
-        topicService.getMessage();
-
+    public void testGetBrokers() throws Exception {
+        assertNotNull(brokerService);
+        final List<ZKBroker> brokers = brokerService.getBrokers();
+        assertNotNull(brokers);
     }
 
-    public void setTopicService(TopicService topicService) {
-        this.topicService = topicService;
+    public void setBrokerService(BrokerService brokerService) {
+        this.brokerService = brokerService;
     }
 }

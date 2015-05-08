@@ -12,6 +12,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 /**
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration("file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml")
+@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/spring/application.xml"})
 public class KafkaLogServiceTest extends Assert{
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -62,6 +63,7 @@ public class KafkaLogServiceTest extends Assert{
 
     @Test
     public void testGetReverseFileContentOps(){
+        assertThat("abc", is("xxx"));
         kafkaLogService.getReverseFileContent("build-0",0,1);
     }
 

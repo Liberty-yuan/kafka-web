@@ -25,7 +25,7 @@ import java.util.*;
  * @version $Id: me.bliss.kafka.web.service, v 0.1 3/26/15
  *          Exp $
  */
-public class SimpleConsumerLogicComponent {
+public class SimpleConsumerComponent {
 
     private String clientName = "lanjue_kafka_" + new Date().getTime();
 

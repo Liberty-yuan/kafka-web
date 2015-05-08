@@ -2,9 +2,7 @@ package me.bliss.kafka.web.controller;
 
 import me.bliss.kafka.web.component.ZookeeperComponent;
 import me.bliss.kafka.web.component.model.Topic;
-import me.bliss.kafka.web.exception.SimpleConsumerLogicException;
 import me.bliss.kafka.web.service.TopicService;
-import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,24 +29,15 @@ public class TopicController {
     @Autowired
     private ZookeeperComponent zookeeperComponent;
 
-    @RequestMapping(value = "/list",method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
-    public List<Topic> getList(){
-        try {
-            return topicService.getAllTopics();
-        } catch (KeeperException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (SimpleConsumerLogicException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public List<Topic> getList() {
+        return topicService.getAllTopics();
     }
 
-    @RequestMapping(value = "/messages",method = RequestMethod.GET)
+    @RequestMapping(value = "/messages", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Map<Integer, List<String>>> getAllMessages(){
+    public Map<String, Map<Integer, List<String>>> getAllMessages() {
         return topicService.getMessage();
     }
 

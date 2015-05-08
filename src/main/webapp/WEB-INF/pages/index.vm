@@ -1,0 +1,9 @@
+#parse("/layout/head.vm")
+
+## 引入导航
+#parse("/layout/nav.vm")
+<div class="container">
+
+</div>
+<script src="/assets/component/main/index.js"></script>
+#parse("/layout/foot.vm")

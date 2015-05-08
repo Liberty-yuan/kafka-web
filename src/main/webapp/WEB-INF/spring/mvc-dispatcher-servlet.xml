@@ -63,11 +63,4 @@
         </property>
     </bean>
 
-
-    <!--<bean id="mapUtils" class="me.bliss.kafka.web.utils.MapUtils"/>-->
-    <bean id="kafkaLogSegmentComponent" class="me.bliss.kafka.web.component.KafkaLogSegmentComponent"/>
-    <bean id="kafkaLogService" class="me.bliss.kafka.web.service.KafkaLogService"></bean>
-    <bean id="kafkaSimpleConsumerLogicComponent" class="me.bliss.kafka.web.component.SimpleConsumerLogicComponent"></bean>
-    <bean id="zookeeperComponent" class="me.bliss.kafka.web.component.ZookeeperComponent"></bean>
-    <bean id="topicService" class="me.bliss.kafka.web.service.TopicService" init-method="init" destroy-method="destory"></bean>
 </beans>
