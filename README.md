@@ -1,2 +1,3 @@
-# kafka-web
-### 基于Spring的Kafka管理系统，提供Kakfa的broker,replica,partitions的信息管理以及消息数据的查看
+### kafka-web
+---
+> kafka-web是使用spring开发的一个kafka状态信息管理的工具系统。通过该系统可以直观地看到kafka中zookeeper/broker/topic的各种状态(包括broker的位置、端口/topic的relication、partitions、leader node等)，同时也可以分页显示每个topic的messages
