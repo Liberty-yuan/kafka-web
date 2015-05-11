@@ -9,6 +9,14 @@ package me.bliss.kafka.web.result;
  */
 public class ServiceResult<T> {
 
+    public ServiceResult(){
+
+    }
+
+    public ServiceResult(boolean success){
+        this.success = success;
+    }
+
     private boolean success;
 
     private T result;

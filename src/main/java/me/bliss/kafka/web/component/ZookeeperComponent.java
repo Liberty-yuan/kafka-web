@@ -3,8 +3,10 @@ package me.bliss.kafka.web.component;
 import com.google.gson.Gson;
 import me.bliss.kafka.web.component.model.ZK;
 import me.bliss.kafka.web.component.model.ZKBroker;
+import me.bliss.kafka.web.component.model.ZKTopic;
 import me.bliss.kafka.web.constant.ServiceContants;
 import me.bliss.kafka.web.exception.ZookeeperException;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 
@@ -86,6 +88,27 @@ public class ZookeeperComponent {
         }
     }
 
+    public List<ZKTopic> getTopicsDetail() throws ZookeeperException {
+        final ArrayList<ZKTopic> zkTopics = new ArrayList<ZKTopic>();
+        final List<String> topicsList = getTopicsList();
+        for (String topic : topicsList) {
+            final ZKTopic zkTopic = new ZKTopic();
+            //获取该topic的partitions集合
+            final List<String> partitions = getChildren(
+                    ServiceContants.KAFKA_BROKERS_TOPIC_PATH + "/" + topic + "/partitions");
+            final ArrayList<Integer> targetPartitions = new ArrayList<Integer>();
+            if (!CollectionUtils.isEmpty(partitions)) {
+                for (String partition : partitions) {
+                    targetPartitions.add(Integer.parseInt(partition));
+                }
+            }
+            zkTopic.setName(topic);
+            zkTopic.setPartitions(targetPartitions);
+            zkTopics.add(zkTopic);
+        }
+        return zkTopics;
+    }
+
     public List<String> getChildren(String path) throws ZookeeperException {
         try {
             return zooKeeper.getChildren(path, watchZookeeperStatus);
@@ -101,7 +124,9 @@ public class ZookeeperComponent {
 
         for (String brokerId : brokerIds) {
             final String data = getData(ServiceContants.KAFKA_BROKERS_IDS_PATH + "/" + brokerId);
-            zkBrokers.add(gson.fromJson(data, ZKBroker.class));
+            final ZKBroker zkBroker = gson.fromJson(data, ZKBroker.class);
+            zkBroker.setId(Integer.parseInt(brokerId));
+            zkBrokers.add(zkBroker);
         }
         return zkBrokers;
     }

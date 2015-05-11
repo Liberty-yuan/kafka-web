@@ -18,6 +18,7 @@
 
     <script src="http://cdn.bootcss.com/vue/0.11.8/vue.js"></script>
 </head>
-<body style="background-image: url('https://t.alipayobjects.com/images/rmsweb/T1e8lfXixvXXXXXXXX.jpg')">
+<body style="background-image: url('https://t.alipayobjects.com/images/rmsweb/T1fShfXiFnXXXXXXXX.jpg')
+;background-attachment:fixed;background-repeat:no-repeat;background-size:cover;">
 
 

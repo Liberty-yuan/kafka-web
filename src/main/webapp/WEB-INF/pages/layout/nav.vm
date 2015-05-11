@@ -1,8 +1,8 @@
-<div class="ui purple inverted menu">
-    <a class="active item">
-        <i class="home icon"></i> 主页
+<div class="ui inverted menu">
+    <a class="active item" href="/">
+        <i class="home icon"></i> KAFKA-WEB
     </a>
-    <a class="item">
+    <a class="item" href="/topics">
         <i class="mail icon"></i> TOPIC
     </a>
 ##    <a class="item">

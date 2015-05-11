@@ -4,11 +4,10 @@ import com.google.gson.Gson;
 import kafka.javaapi.consumer.SimpleConsumer;
 import me.bliss.kafka.web.component.SimpleConsumerComponent;
 import me.bliss.kafka.web.component.ZookeeperComponent;
-import me.bliss.kafka.web.component.model.Partitions;
-import me.bliss.kafka.web.component.model.Topic;
-import me.bliss.kafka.web.component.model.ZKBroker;
+import me.bliss.kafka.web.component.model.*;
 import me.bliss.kafka.web.exception.SimpleConsumerLogicException;
 import me.bliss.kafka.web.exception.ZookeeperException;
+import me.bliss.kafka.web.result.ServiceResult;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -147,6 +146,22 @@ public class TopicService {
         }
 
         return topicMessages;
+    }
+
+    public ServiceResult<Map<String, Object>> getKafkaEnvDetail() {
+        final ServiceResult<Map<String, Object>> serviceResult = new ServiceResult<Map<String, Object>>(true);
+        final HashMap<String, Object> map = new HashMap<String,Object>();
+        try {
+            final ZK zkDetail = zookeeperComponent.getZKDetail();
+            final List<ZKBroker> brokersList = zookeeperComponent.getBrokersList();
+            map.put("zookeeper",zkDetail);
+            map.put("brokers",brokersList);
+            map.put("topics",getAllTopics());
+            serviceResult.setResult(map);
+        } catch (ZookeeperException e) {
+            e.printStackTrace();
+        }
+        return serviceResult;
     }
 
     public void setSimpleConsumerComponent(

@@ -13,6 +13,8 @@ import java.util.Date;
  */
 public class ZKBroker {
 
+    private int id;
+
     private String host;
 
     private int port;
@@ -69,5 +71,13 @@ public class ZKBroker {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

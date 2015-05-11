@@ -2,14 +2,11 @@ package me.bliss.kafka.web.service;
 
 import me.bliss.kafka.web.component.SimpleConsumerComponent;
 import me.bliss.kafka.web.component.ZookeeperComponent;
-import me.bliss.kafka.web.component.model.ZK;
 import me.bliss.kafka.web.component.model.ZKBroker;
 import me.bliss.kafka.web.exception.ZookeeperException;
-import me.bliss.kafka.web.result.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -35,15 +32,7 @@ public class BrokerService {
         return null;
     }
 
-    public void getKafkaEnvDetail() {
-        final ServiceResult<Map<String, Object>> serviceResult = new ServiceResult<Map<String, Object>>();
-        try {
-            final ZK zkDetail = zookeeperComponent.getZKDetail();
-            final List<ZKBroker> brokersList = zookeeperComponent.getBrokersList();
-        } catch (ZookeeperException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     public void setZookeeperComponent(ZookeeperComponent zookeeperComponent) {
         this.zookeeperComponent = zookeeperComponent;
