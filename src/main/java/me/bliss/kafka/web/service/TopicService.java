@@ -8,6 +8,7 @@ import me.bliss.kafka.web.component.model.*;
 import me.bliss.kafka.web.exception.SimpleConsumerLogicException;
 import me.bliss.kafka.web.exception.ZookeeperException;
 import me.bliss.kafka.web.result.ServiceResult;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -70,9 +71,8 @@ public class TopicService {
         return allTopics;
     }
 
-    public Map<String, Map<Integer, List<String>>> getMessage() {
-        final HashMap<String, Map<Integer, List<String>>> topicMessages = new HashMap<String, Map<Integer, List<String>>>();
-
+    public List<TopicMessage> getMessage() {
+        final ArrayList<TopicMessage> topicMessages = new ArrayList<TopicMessage>();
         final List<Topic> allTopics;
         try {
             allTopics = getAllTopics();
@@ -81,8 +81,10 @@ public class TopicService {
                     continue;
                 }
                 final Iterator<Partitions> iterator = topic.getPartitionses().iterator();
-                final HashMap<Integer, List<String>> partitionMessages = new HashMap<Integer, List<String>>();
+                final TopicMessage topicMessage = new TopicMessage();
+                final ArrayList<PartitionMessage> partitionMessages = new ArrayList<PartitionMessage>();
                 while (iterator.hasNext()) {
+                    final PartitionMessage partitionMessage = new PartitionMessage();
                     final Partitions partitions = iterator.next();
                     simpleConsumerComponent
                             .getLeaderSimpleConsumer(simpleConsumer.host(), simpleConsumer.port(),
@@ -92,13 +94,19 @@ public class TopicService {
                     final long lastOffset = simpleConsumerComponent
                             .getLastOffset(simpleConsumer, topic.getName(), partitions.getId());
                     if (earliestOffset != lastOffset && earliestOffset < lastOffset) {
-                        final List<String> data = simpleConsumerComponent
-                                .readData(simpleConsumer, topic.getName(), partitions.getId(), 10);
-                        partitionMessages.put(partitions.getId(), data);
+                        int startOffset = (int) (lastOffset - 10 > 0 ? lastOffset -10 : earliestOffset);
+                        final List<String> data = simpleConsumerComponent.readDataForPage(
+                                simpleConsumer, topic.getName(), partitions.getId(),
+                                startOffset, 10);
+                        partitionMessage.setId(partitions.getId());
+                        partitionMessage.setMessages(data);
+                        partitionMessages.add(partitionMessage);
                     }
 
                 }
-                topicMessages.put(topic.getName(), partitionMessages);
+                topicMessage.setName(topic.getName());
+                topicMessage.setPartitionMessages(partitionMessages);
+                topicMessages.add(topicMessage);
             }
         } catch (SimpleConsumerLogicException e) {
             e.printStackTrace();
@@ -109,6 +117,11 @@ public class TopicService {
         return topicMessages;
     }
 
+    public List<TopicMessage> getMessagesByReverse(){
+        final List<TopicMessage> topicMessages = getMessage();
+        ArrayUtils.reverse(topicMessages.toArray());
+        return topicMessages;
+    }
 
     public Map<String, Map<Integer, List<String>>> getMessagesForPage(int pageNum, int pageSize) {
         final HashMap<String, Map<Integer, List<String>>> topicMessages = new HashMap<String, Map<Integer, List<String>>>();
@@ -149,16 +162,35 @@ public class TopicService {
     }
 
     public ServiceResult<Map<String, Object>> getKafkaEnvDetail() {
-        final ServiceResult<Map<String, Object>> serviceResult = new ServiceResult<Map<String, Object>>(true);
-        final HashMap<String, Object> map = new HashMap<String,Object>();
+        final ServiceResult<Map<String, Object>> serviceResult = new ServiceResult<Map<String, Object>>(
+                true);
+        final HashMap<String, Object> map = new HashMap<String, Object>();
         try {
             final ZK zkDetail = zookeeperComponent.getZKDetail();
             final List<ZKBroker> brokersList = zookeeperComponent.getBrokersList();
-            map.put("zookeeper",zkDetail);
-            map.put("brokers",brokersList);
-            map.put("topics",getAllTopics());
+            map.put("zookeeper", zkDetail);
+            map.put("brokers", brokersList);
+            map.put("topics", getAllTopics());
             serviceResult.setResult(map);
         } catch (ZookeeperException e) {
+            serviceResult.setSuccess(false);
+            serviceResult.setErrorMsg(e.getMessage());
+            e.printStackTrace();
+        }
+        return serviceResult;
+    }
+
+    public ServiceResult<List<ZookeeperNode>> getNodesTree() {
+        final ArrayList<ZookeeperNode> zookeeperNodes = new ArrayList<ZookeeperNode>();
+        final ServiceResult<List<ZookeeperNode>> serviceResult = new ServiceResult<List<ZookeeperNode>>(
+                true);
+        try {
+            zookeeperComponent.getAllNodes("/", zookeeperNodes);
+
+            serviceResult.setResult(zookeeperNodes);
+        } catch (ZookeeperException e) {
+            serviceResult.setSuccess(false);
+            serviceResult.setErrorMsg(e.getMessage());
             e.printStackTrace();
         }
         return serviceResult;

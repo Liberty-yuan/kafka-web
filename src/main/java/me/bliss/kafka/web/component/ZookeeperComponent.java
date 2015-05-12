@@ -3,8 +3,10 @@ package me.bliss.kafka.web.component;
 import com.google.gson.Gson;
 import me.bliss.kafka.web.component.model.ZK;
 import me.bliss.kafka.web.component.model.ZKBroker;
+import me.bliss.kafka.web.component.model.ZookeeperNode;
 import me.bliss.kafka.web.constant.ServiceContants;
 import me.bliss.kafka.web.exception.ZookeeperException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 
@@ -62,7 +64,7 @@ public class ZookeeperComponent {
     public String getData(String path) throws ZookeeperException {
         try {
             byte[] data = zooKeeper.getData(path, watchZookeeperStatus, null);
-            return new String(data);
+            return data == null ? "" : new String(data);
         } catch (Exception e) {
             throw new ZookeeperException("获取数据失败");
         }
@@ -132,6 +134,21 @@ public class ZookeeperComponent {
         zk.setHost(host);
         zk.setPort(port);
         return zk;
+    }
+
+    public void getAllNodes(String path,List<ZookeeperNode> tree) throws ZookeeperException {
+        if (isExists(path)) {
+            final List<String> children = getChildren(path);
+            for (String child : children) {
+                final ZookeeperNode zookeeperNode = new ZookeeperNode();
+                String realPath = StringUtils.equals(path, "/") ? path+child : path+"/"+child;
+                final String data = getData(realPath);
+                zookeeperNode.setPath(realPath);
+                zookeeperNode.setData(data);
+                tree.add(zookeeperNode);
+                getAllNodes(realPath, tree);
+            }
+        }
     }
 
     static class WatchZookeeperStatus implements Watcher {

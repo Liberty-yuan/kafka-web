@@ -2,6 +2,7 @@ package me.bliss.kafka.web.controller;
 
 import me.bliss.kafka.web.component.ZookeeperComponent;
 import me.bliss.kafka.web.component.model.Topic;
+import me.bliss.kafka.web.component.model.TopicMessage;
 import me.bliss.kafka.web.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -37,7 +37,7 @@ public class TopicController {
 
     @RequestMapping(value = "/messages", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Map<Integer, List<String>>> getAllMessages() {
+    public List<TopicMessage> getAllMessages() {
         return topicService.getMessage();
     }
 

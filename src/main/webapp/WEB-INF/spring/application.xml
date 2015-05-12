@@ -20,5 +20,4 @@
 
     <bean id="topicService" class="me.bliss.kafka.web.service.TopicService" init-method="init" destroy-method="destory"></bean>
 
-    <bean id="brokerService" class="me.bliss.kafka.web.service.BrokerService"></bean>
 </beans>

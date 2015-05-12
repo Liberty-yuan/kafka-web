@@ -10,6 +10,8 @@
     .ui .accordion:first-child
 </style>
 <div style="width: 1150px;margin: 0 auto;">
+
+
     <div class="ui inverted segment">
         <div class="ui inverted accordion">
             #foreach($topic in $topics)

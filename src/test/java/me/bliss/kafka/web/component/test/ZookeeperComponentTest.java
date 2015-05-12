@@ -1,6 +1,7 @@
 package me.bliss.kafka.web.component.test;
 
 import me.bliss.kafka.web.component.ZookeeperComponent;
+import me.bliss.kafka.web.component.model.ZookeeperNode;
 import me.bliss.kafka.web.exception.ZookeeperException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,6 +16,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -66,6 +68,12 @@ public class ZookeeperComponentTest extends Assert{
         final List<String> children = zookeeperComponent.getChildren("/lanjue");
         assertNotNull(children);
         assertTrue(children.size() == 0);
+    }
+
+    @Test
+    public void testNodeTree() throws Exception {
+        final ArrayList<ZookeeperNode> tree = new ArrayList<ZookeeperNode>();
+
     }
 
     @Test

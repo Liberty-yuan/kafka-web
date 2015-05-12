@@ -1,7 +1,6 @@
 package me.bliss.kafka.web.service.test;
 
 import me.bliss.kafka.web.component.model.ZKBroker;
-import me.bliss.kafka.web.service.BrokerService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,17 +39,4 @@ public class BrokerServiceTest extends Assert{
         this.mockMvc = webAppContextSetup(this.webApplicationContext).build();
     }
 
-    @Autowired
-    private BrokerService brokerService;
-
-    @Test
-    public void testGetBrokers() throws Exception {
-        assertNotNull(brokerService);
-        final List<ZKBroker> brokers = brokerService.getBrokers();
-        assertNotNull(brokers);
-    }
-
-    public void setBrokerService(BrokerService brokerService) {
-        this.brokerService = brokerService;
-    }
 }
