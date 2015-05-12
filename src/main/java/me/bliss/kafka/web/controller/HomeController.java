@@ -45,6 +45,11 @@ public class HomeController {
         return "topics";
     }
 
+    @RequestMapping(value = "/messages",method = RequestMethod.GET)
+    public String messages(){
+        return "messages";
+    }
+
     public void setBrokerService(BrokerService brokerService) {
         this.brokerService = brokerService;
     }

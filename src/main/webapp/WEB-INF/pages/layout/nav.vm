@@ -5,6 +5,9 @@
     <a class="item" href="/topics">
         <i class="mail icon"></i> TOPIC
     </a>
+    <a class="item" href="/messages">
+        <i class="mail icon"></i> MESSAGES
+    </a>
 ##    <a class="item">
 ##        <i class="user icon"></i> 朋友们
 ##    </a>

@@ -6,23 +6,47 @@
     .ui-white-font {
         color: #fff;
     }
+
+    .ui .accordion:first-child
 </style>
 <div style="width: 1150px;margin: 0 auto;">
-    #foreach($topic in $topics)
-        <h3 class="ui-white-font">$topic.name</h3>
+    <div class="ui inverted segment">
+        <div class="ui inverted accordion">
+            #foreach($topic in $topics)
+                <div class="active title">
+                    <i class="dropdown icon"></i>
+                    TOPIC:&nbsp;$topic.name
+                </div>
+                <div class="content">
+                    #foreach($partition in $topic.partitionses)
+                        <div>Partition No [$partition.id]</div>
+                        <div class="ui inverted segment">
+                            <div class="ui inverted relaxed divided list">
+                                <div class="item">
+                                    <div class="content">
+                                        <div class="header">Leader</div>
 
-        <div class="ui inverted segment">
-            <div class="ui inverted relaxed divided list">
-                <div class="item">
-                    <div class="content">
+                                        <table class="ui inverted table">
+                                            <thead>
+                                            <tr>
+                                                <th>BrokerId</th>
+                                                <th>Host</th>
+                                                <th>Port</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <td>$partition.leader.id</td>
+                                            <td>$partition.leader.host</td>
+                                            <td>$partition.leader.port</td>
+                                            </tbody>
+                                        </table>
 
-                        #foreach($partition in $topic.partitionses)
-                            <div>Partition No [$partition.id]</div>
-                            <div class="ui inverted segment">
-                                <div class="ui inverted relaxed divided list">
-                                    <div class="item">
-                                        <div class="content">
-                                            <div class="header">Leader</div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="content">
+                                        <div class="header">Replicas</div>
+                                        #foreach($replica in $partition.replicas)
 
                                             <table class="ui inverted table">
                                                 <thead>
@@ -33,48 +57,33 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <td>$partition.leader.id</td>
-                                                <td>$partition.leader.host</td>
-                                                <td>$partition.leader.port</td>
+                                                <td>$replica.id</td>
+                                                <td>$replica.host</td>
+                                                <td>$replica.port</td>
                                                 </tbody>
                                             </table>
 
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="content">
-                                            <div class="header">Replicas</div>
-                                            #foreach($replica in $partition.replicas)
-
-                                                <table class="ui inverted table">
-                                                    <thead>
-                                                    <tr>
-                                                        <th>BrokerId</th>
-                                                        <th>Host</th>
-                                                        <th>Port</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <td>$replica.id</td>
-                                                    <td>$replica.host</td>
-                                                    <td>$replica.port</td>
-                                                    </tbody>
-                                                </table>
-
-                                            #end
-                                        </div>
+                                        #end
                                     </div>
                                 </div>
                             </div>
-                        #end
-
-
-                    </div>
+                        </div>
+                    #end
                 </div>
-            </div>
+            #end
         </div>
-    #end
+    </div>
+
 
 </div>
-<script src="/assets/component/main/index.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.ui.accordion')
+                .accordion()
+                .children()
+                .eq(1)
+                .addClass('active')
+
+    })
+</script>
 #parse("/layout/foot.vm")

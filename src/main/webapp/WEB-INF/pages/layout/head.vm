@@ -5,7 +5,7 @@
     <title></title>
 
     <link rel="stylesheet" href="/assets/semantic.min.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
+##    <link rel="stylesheet" href="/assets/css/style.css">
 
 
     <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->

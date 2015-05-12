@@ -1,0 +1,17 @@
+#parse("/layout/head.vm")
+
+## 引入导航
+#parse("/layout/nav.vm")
+<style>
+    .ui-white-font{
+        color: #fff;
+    }
+</style>
+<div style="width: 1150px;margin: 0 auto;">
+
+    messages
+
+
+</div>
+<script src="/assets/component/main/index.js"></script>
+#parse("/layout/foot.vm")
