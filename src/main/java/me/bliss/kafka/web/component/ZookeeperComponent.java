@@ -24,7 +24,7 @@ import java.util.List;
 
 public class ZookeeperComponent {
 
-    private String host = "qingting.manage.alipay.net";
+    private String host = "zassets.ui.alipay.net";
 
     private int port = 2181;
 

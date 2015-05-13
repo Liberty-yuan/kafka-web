@@ -1,6 +1,5 @@
 package me.bliss.kafka.web.service;
 
-import com.google.gson.Gson;
 import kafka.javaapi.consumer.SimpleConsumer;
 import me.bliss.kafka.web.component.SimpleConsumerComponent;
 import me.bliss.kafka.web.component.ZookeeperComponent;
@@ -8,7 +7,6 @@ import me.bliss.kafka.web.component.model.*;
 import me.bliss.kafka.web.exception.SimpleConsumerLogicException;
 import me.bliss.kafka.web.exception.ZookeeperException;
 import me.bliss.kafka.web.result.ServiceResult;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,7 +31,6 @@ public class TopicService {
     private SimpleConsumer simpleConsumer;
 
     private void init() {
-        final Gson gson = new Gson();
         final List<ZKBroker> brokersList;
         try {
             brokersList = zookeeperComponent.getBrokersList();
@@ -58,8 +55,8 @@ public class TopicService {
         try {
             zkTopicsList = zookeeperComponent.getTopicsList();
             for (String zkTopic : zkTopicsList) {
-                final Topic topic = simpleConsumerComponent
-                        .getAllLeadersBySingleTopic(simpleConsumer, zkTopic);
+                final Topic topic = simpleConsumerComponent.getAllLeadersBySingleTopic(
+                        simpleConsumer, zkTopic);
                 allTopics.add(topic);
             }
         } catch (ZookeeperException e) {
@@ -71,7 +68,7 @@ public class TopicService {
         return allTopics;
     }
 
-    public List<TopicMessage> getMessage() {
+    public List<TopicMessage> getAllMessages() {
         final ArrayList<TopicMessage> topicMessages = new ArrayList<TopicMessage>();
         final List<Topic> allTopics;
         try {
@@ -80,33 +77,7 @@ public class TopicService {
                 if (StringUtils.equals(topic.getName(), "__consumer_offsets")) {
                     continue;
                 }
-                final Iterator<Partitions> iterator = topic.getPartitionses().iterator();
-                final TopicMessage topicMessage = new TopicMessage();
-                final ArrayList<PartitionMessage> partitionMessages = new ArrayList<PartitionMessage>();
-                while (iterator.hasNext()) {
-                    final PartitionMessage partitionMessage = new PartitionMessage();
-                    final Partitions partitions = iterator.next();
-                    simpleConsumerComponent
-                            .getLeaderSimpleConsumer(simpleConsumer.host(), simpleConsumer.port(),
-                                    topic.getName(), partitions.getId());
-                    final long earliestOffset = simpleConsumerComponent
-                            .getEarliestOffset(simpleConsumer, topic.getName(), partitions.getId());
-                    final long lastOffset = simpleConsumerComponent
-                            .getLastOffset(simpleConsumer, topic.getName(), partitions.getId());
-                    if (earliestOffset != lastOffset && earliestOffset < lastOffset) {
-                        int startOffset = (int) (lastOffset - 10 > 0 ? lastOffset -10 : earliestOffset);
-                        final List<String> data = simpleConsumerComponent.readDataForPage(
-                                simpleConsumer, topic.getName(), partitions.getId(),
-                                startOffset, 10);
-                        partitionMessage.setId(partitions.getId());
-                        partitionMessage.setMessages(data);
-                        partitionMessages.add(partitionMessage);
-                    }
-
-                }
-                topicMessage.setName(topic.getName());
-                topicMessage.setPartitionMessages(partitionMessages);
-                topicMessages.add(topicMessage);
+                topicMessages.add(readTopicMessage(topic));
             }
         } catch (SimpleConsumerLogicException e) {
             e.printStackTrace();
@@ -117,48 +88,73 @@ public class TopicService {
         return topicMessages;
     }
 
-    public List<TopicMessage> getMessagesByReverse(){
-        final List<TopicMessage> topicMessages = getMessage();
-        ArrayUtils.reverse(topicMessages.toArray());
-        return topicMessages;
-    }
-
-    public Map<String, Map<Integer, List<String>>> getMessagesForPage(int pageNum, int pageSize) {
-        final HashMap<String, Map<Integer, List<String>>> topicMessages = new HashMap<String, Map<Integer, List<String>>>();
-
+    public ServiceResult<TopicMessage> getMessagesByTopic(String topicName){
+        final ServiceResult<TopicMessage> serviceResult = new ServiceResult<TopicMessage>(true);
+        final List<Topic> topics = getAllTopics();
+        final Topic topic = findTopicByName(topics, topicName);
+        if (topic == null){
+            serviceResult.setSuccess(false);
+            serviceResult.setErrorMsg("invalid topic name!");
+            return serviceResult;
+        }
         try {
-            final List<Topic> allTopics = getAllTopics();
-            for (Topic topic : allTopics) {
-                if (StringUtils.equals(topic.getName(), "__consumer_offsets")) {
-                    continue;
-                }
-                final Iterator<Partitions> iterator = topic.getPartitionses().iterator();
-                final HashMap<Integer, List<String>> partitionMessages = new HashMap<Integer, List<String>>();
-                while (iterator.hasNext()) {
-                    final Partitions partitions = iterator.next();
-                    simpleConsumerComponent
-                            .getLeaderSimpleConsumer(simpleConsumer.host(), simpleConsumer.port(),
-                                    topic.getName(), partitions.getId());
-                    final long earliestOffset = simpleConsumerComponent
-                            .getEarliestOffset(simpleConsumer, topic.getName(), partitions.getId());
-                    final long lastOffset = simpleConsumerComponent
-                            .getLastOffset(simpleConsumer, topic.getName(), partitions.getId());
-                    if (earliestOffset != lastOffset && earliestOffset < lastOffset) {
-                        final List<String> data = simpleConsumerComponent
-                                .readData(simpleConsumer, topic.getName(), partitions.getId(), 10);
-                        partitionMessages.put(partitions.getId(), data);
-                    }
-
-                }
-                topicMessages.put(topic.getName(), partitionMessages);
-            }
+            final TopicMessage topicMessage = readTopicMessage(topic);
+            serviceResult.setResult(topicMessage);
+            return serviceResult;
         } catch (SimpleConsumerLogicException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        return null;
+    }
 
-        return topicMessages;
+    private Topic findTopicByName(List<Topic> topics,String topicName){
+        for (Topic topic : topics){
+            if (StringUtils.equals(topic.getName(),topicName)){
+                return topic;
+            }
+        }
+        return null;
+    }
+
+    private TopicMessage readTopicMessage(Topic topic)
+            throws SimpleConsumerLogicException, UnsupportedEncodingException {
+        final Iterator<Partitions> iterator = topic.getPartitionses().iterator();
+        final TopicMessage topicMessage = new TopicMessage();
+        final ArrayList<PartitionMessage> partitionMessages = new ArrayList<PartitionMessage>();
+        while (iterator.hasNext()) {
+            final Partitions partition = iterator.next();
+            partitionMessages.add(readPartitionData(topic.getName(), partition, 10));
+        }
+        topicMessage.setName(topic.getName());
+        topicMessage.setPartitionMessages(partitionMessages);
+        return topicMessage;
+    }
+
+    private PartitionMessage readPartitionData(String topic, Partitions partition, int fetchSize)
+            throws SimpleConsumerLogicException, UnsupportedEncodingException {
+        final PartitionMessage partitionMessage = new PartitionMessage();
+        final SimpleConsumer leaderSimpleConsumer = simpleConsumerComponent
+                .getLeaderSimpleConsumer(simpleConsumer.host(), simpleConsumer.port(),
+                        topic, partition.getId());
+        final long earliestOffset = simpleConsumerComponent
+                .getEarliestOffset(leaderSimpleConsumer, topic,
+                        partition.getId());
+        final long lastOffset = simpleConsumerComponent
+                .getLastOffset(leaderSimpleConsumer, topic,
+                        partition.getId());
+        if (earliestOffset != lastOffset && earliestOffset < lastOffset) {
+            int startOffset = (int) (lastOffset - 10 > 0 ?
+                    lastOffset - 10 :
+                    earliestOffset);
+            final List<String> data = simpleConsumerComponent.readDataForPage(
+                    leaderSimpleConsumer, topic, partition.getId(),
+                    startOffset, fetchSize);
+            partitionMessage.setId(partition.getId());
+            partitionMessage.setMessages(data);
+        }
+        return partitionMessage;
     }
 
     public ServiceResult<Map<String, Object>> getKafkaEnvDetail() {

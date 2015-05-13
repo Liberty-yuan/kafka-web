@@ -20,4 +20,5 @@
 
     <bean id="topicService" class="me.bliss.kafka.web.service.TopicService" init-method="init" destroy-method="destory"></bean>
 
+    <bean id="errorConsumer" class="me.bliss.kafka.web.component.kafka.ErrorConsumer" init-method="listenErrorMessage"></bean>
 </beans>
