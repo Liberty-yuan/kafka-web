@@ -1,0 +1,61 @@
+#parse("/layout/head.vm")
+
+## 引入导航
+#parse("/layout/nav.vm")
+<style>
+    .ui-white-font {
+        color: #fff;
+    }
+</style>
+<div style="width: 1150px;margin: 0 auto;">
+
+    <div class="ui inverted segment">
+        <div class="ui inverted accordion">
+            #foreach($topic in $topics)
+                <div class="active title">
+                    <i class="dropdown icon"></i>
+                    TOPIC:&nbsp;$topic.name
+                </div>
+                <div class="content">
+                    <div class="content">
+                        <table class="ui inverted table">
+                            <thead>
+                            <tr>
+                                <th>PartitionId</th>
+                                <th>Messages</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                #foreach($partition in $topic.partitionMessages)
+                                <tr>
+                                    <td>$partition.id</td>
+                                    <td>
+                                        #foreach($message in $partition.messages)
+                                        $message
+                                            <hr>
+                                        #end
+                                    </td>
+                                </tr>
+                                #end
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            #end
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.ui.accordion')
+                .accordion()
+                .children()
+                .eq(1)
+                .addClass('active')
+
+    })
+</script>
+#parse("/layout/foot.vm")
