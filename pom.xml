@@ -7,10 +7,9 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>kafka-biz-service</module>
+        <module>biz-service</module>
         <module>kafka-model</module>
-        <module>kafka-core</module>
-        <module>kafka-biz-web</module>
+        <module>core-service</module>
         <module>web-home</module>
     </modules>
 

@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.bliss.kafka</groupId>
-    <artifactId>kafka-core</artifactId>
+    <artifactId>core-service</artifactId>
 
     <dependencies>
         <dependency>
