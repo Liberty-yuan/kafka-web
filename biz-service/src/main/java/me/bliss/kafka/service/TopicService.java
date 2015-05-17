@@ -153,6 +153,9 @@ public class TopicService {
                     startOffset, fetchSize);
             partitionMessage.setId(partition.getId());
             partitionMessage.setMessages(data);
+        }else{
+            partitionMessage.setId(partition.getId());
+            partitionMessage.setMessages(new ArrayList<String>());
         }
         return partitionMessage;
     }

@@ -56,8 +56,16 @@ public class HomeController {
     public String messages(ModelMap model) {
         final List<TopicMessage> topicMessages = topicService.getAllMessages();
         for (TopicMessage topicMessage : topicMessages) {
+            final ArrayList<PartitionMessage> htmlPartitionMessages = new ArrayList<PartitionMessage>();
             for (PartitionMessage partitionMessage : topicMessage.getPartitionMessages()) {
-                partitionMessage.setMessages(partitionMessage.getMessages());
+                final List<String> messages = partitionMessage.getMessages();
+                final ArrayList<String> htmlMessages = new ArrayList<String>();
+                for (String message : messages) {
+                    final String replace = message.replace("\\n","<br>");
+                    htmlMessages.add(replace);
+                }
+                partitionMessage.setMessages(htmlMessages);
+                htmlPartitionMessages.add(partitionMessage);
             }
         }
         model.put("topics", topicMessages);
@@ -67,7 +75,7 @@ public class HomeController {
     private List<String> brSplitList(List<String> messages) {
         final ArrayList<String> temp = new ArrayList<String>();
         for (String message : messages) {
-            temp.add(message+"<br>");
+            temp.add(message + "<br>");
         }
         return temp;
     }

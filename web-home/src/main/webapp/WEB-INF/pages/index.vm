@@ -83,5 +83,4 @@
         </tbody>
     </table>
 </div>
-<script src="/assets/component/main/index.js"></script>
 #parse("/layout/foot.vm")
