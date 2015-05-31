@@ -32,23 +32,14 @@ public class SimpleConsumerComponent {
 
     private int bufferSize = 1024 * 1024;
 
-    /**
-     *  send the topic query request to broker,respose topics detail info of partitions in topic from the broker
-     *
-     * @param host          active broker's host(ip/address)
-     * @param port          active broker's port
-     * @param topic         one topic of searched
-     * @param partition     the partitions of topic
-     * @return
-     */
-    public Topic getLeaderByTopicAndPartitions(String host, int port,
-                                               String topic, int partition)
+    public Topic getLeaderByTopicAndPartition(String host, int port,
+                                              String topic, int partition)
             throws SimpleConsumerLogicException {
         SimpleConsumer simpleConsumer = null;
         Topic topicResult = null;
         try {
             simpleConsumer = createSimpleSumer(host, port);
-            topicResult = getLeaderByTopicAndPartitions(simpleConsumer,
+            topicResult = getLeaderByTopicAndPartition(simpleConsumer,
                     topic, partition);
         } finally {
             if (simpleConsumer != null) {
@@ -58,15 +49,8 @@ public class SimpleConsumerComponent {
         return topicResult;
     }
 
-    /**
-     *   send the topic query request to broker,response topics detail info of partitions in topic from the broker
-     * @param simpleConsumer  connected to borker's consumer
-     * @param topic           one topic of searched
-     * @param partition       the partitions of topic
-     * @return
-     */
-    public Topic getLeaderByTopicAndPartitions(SimpleConsumer simpleConsumer, String topic,
-                                               int partition) throws SimpleConsumerLogicException {
+    public Topic getLeaderByTopicAndPartition(SimpleConsumer simpleConsumer, String topic,
+                                              int partition) throws SimpleConsumerLogicException {
         final TopicMetadataResponse topicMetadataResponse = sendConsumerRequest(simpleConsumer,
                 Collections.singletonList(topic));
         final List<TopicMetadata> topicMetadatas = topicMetadataResponse.topicsMetadata();
@@ -85,13 +69,6 @@ public class SimpleConsumerComponent {
         return resultTopic;
     }
 
-    /**
-     *   send the topic query request to broker,respose topics detail info from the seedBroker
-     * @param host       active broker's host(ip/address)
-     * @param port       active broker's port
-     * @param topic      one topic of searched
-     * @return
-     */
     public Topic getAllLeadersBySingleTopic(String host, int port,
                                             String topic) throws SimpleConsumerLogicException {
 
@@ -108,13 +85,6 @@ public class SimpleConsumerComponent {
         return topicResult;
     }
 
-    /**
-     *   send the topic query request to broker,respose topics detail info from the seedBroker
-     * @param simpleConsumer  connected to borker's consumer
-     * @param topic           one topic of searched
-     * @return
-     * @throws SimpleConsumerLogicException
-     */
     public Topic getAllLeadersBySingleTopic(SimpleConsumer simpleConsumer, String topic)
             throws SimpleConsumerLogicException {
         final TopicMetadataResponse topicMetadataResponse = sendConsumerRequest(simpleConsumer,
@@ -123,14 +93,6 @@ public class SimpleConsumerComponent {
         return handleTopicMetadata(topicMetadata);
     }
 
-    /**
-     *   send the topic query reqeust to broker,response topics detail info from the broker
-     * @param host       active broker's host(ip/address)
-     * @param port       active broker's port
-     * @param topics     multi topics of searched
-     * @return
-     * @throws SimpleConsumerLogicException
-     */
     public List<Topic> getAllLeadersByMultiTopics(String host, int port,
                                                   List<String> topics)
             throws SimpleConsumerLogicException {
@@ -149,13 +111,6 @@ public class SimpleConsumerComponent {
         return result;
     }
 
-    /**
-     *  send the topic query reqeust to broker,response topics detail info from the broker
-     * @param simpleConsumer  connected to borker's consumer
-     * @param topics          multi topics of searched
-     * @return
-     * @throws SimpleConsumerLogicException
-     */
     public List<Topic> getAllLeadersByMultiTopics(SimpleConsumer simpleConsumer,
                                                   List<String> topics)
             throws SimpleConsumerLogicException {
@@ -169,14 +124,6 @@ public class SimpleConsumerComponent {
         return result;
     }
 
-    /**
-     *  send the topic query request to broker
-     * @param host      active broker's host(ip/address)
-     * @param port      active broker's port
-     * @param topics    multi topics of searched
-     * @return
-     * @throws SimpleConsumerLogicException
-     */
     private TopicMetadataResponse sendConsumerRequest(String host, int port,
                                                       List<String> topics)
             throws SimpleConsumerLogicException {
@@ -196,13 +143,6 @@ public class SimpleConsumerComponent {
         return topicMetadataResponse;
     }
 
-    /**
-     *  send the topic query request to broker
-     * @param simpleConsumer  connected to borker's consumer
-     * @param topics          multi topics of searched
-     * @return
-     * @throws SimpleConsumerLogicException
-     */
     private TopicMetadataResponse sendConsumerRequest(SimpleConsumer simpleConsumer,
                                                       List<String> topics)
             throws SimpleConsumerLogicException {
@@ -213,11 +153,6 @@ public class SimpleConsumerComponent {
         return topicMetadataResponse;
     }
 
-    /**
-     *  TopicMetadata warpper to Topic
-     * @param topicMetadata
-     * @return
-     */
     private Topic handleTopicMetadata(TopicMetadata topicMetadata) {
         final Topic topic = new Topic();
         topic.setName(topicMetadata.topic());
@@ -246,14 +181,6 @@ public class SimpleConsumerComponent {
         return topic;
     }
 
-    /**
-     *  query the earliest offset of one topic
-     * @param host        active broker's host(ip/address)
-     * @param port        active broker's port
-     * @param topic       one topic of searched
-     * @param partition   the partitions of topic
-     * @return
-     */
     public long getEarliestOffset(String host, int port, String topic, int partition)
             throws SimpleConsumerLogicException {
         SimpleConsumer simpleConsumer = null;
@@ -269,13 +196,6 @@ public class SimpleConsumerComponent {
         return result;
     }
 
-    /**
-     *  query the earliest offset of one topic
-     * @param simpleConsumer  connected to borker's consumer
-     * @param topic           one topic of searched
-     * @param partition       the partitions of topic
-     * @return
-     */
     public long getEarliestOffset(SimpleConsumer simpleConsumer, String topic, int partition) {
         final TopicAndPartition topicAndPartition = new TopicAndPartition(topic, partition);
         final Map<TopicAndPartition, PartitionOffsetRequestInfo> offsetRequestInfo =
@@ -296,22 +216,14 @@ public class SimpleConsumerComponent {
         return offsets[0];
     }
 
-    /**
-     *  query the last offset of one topic
-     * @param host            active broker's host(ip/address)
-     * @param port            active broker's port
-     * @param topic           one topic of searched
-     * @param partition       the partitions of topic
-     * @return
-     */
     public long getLastOffset(String host, int port, String topic, int partition)
             throws SimpleConsumerLogicException {
         SimpleConsumer simpleConsumer = null;
         long result = 0;
         try {
-            simpleConsumer = getLeaderSimpleConsumer(host,port,topic,partition);
-            result = getLastOffset(simpleConsumer,topic,partition);
-        }finally {
+            simpleConsumer = getLeaderSimpleConsumer(host, port, topic, partition);
+            result = getLastOffset(simpleConsumer, topic, partition);
+        } finally {
             if (simpleConsumer != null) {
                 simpleConsumer.close();
             }
@@ -319,20 +231,12 @@ public class SimpleConsumerComponent {
         return result;
     }
 
-    /**
-     *  query the last offset of one topic
-     * @param simpleConsumer   connected to borker's consumer
-     * @param topic            one topic of searched
-     * @param partition        the partitions of topic
-     * @return
-     */
     public long getLastOffset(SimpleConsumer simpleConsumer, String topic, int partition) {
         final TopicAndPartition topicAndPartition = new TopicAndPartition(topic, partition);
         final Map<TopicAndPartition, PartitionOffsetRequestInfo> offsetRequestInfo =
                 new HashMap<TopicAndPartition, PartitionOffsetRequestInfo>();
         offsetRequestInfo.put(topicAndPartition, new PartitionOffsetRequestInfo(
                 kafka.api.OffsetRequest.LatestTime(), 1));
-
         final OffsetRequest offsetRequest = new OffsetRequest(offsetRequestInfo,
                 kafka.api.OffsetRequest.CurrentVersion(), clientName);
         final OffsetResponse offsetsBeforeResponse = simpleConsumer
@@ -346,15 +250,6 @@ public class SimpleConsumerComponent {
         return offsets[0];
     }
 
-    /**
-     *  reqd data from broker
-     * @param host           active broker's host(ip/address)
-     * @param port           active broker's port
-     * @param topic          one topic of searched
-     * @param partition      the partitions of topic
-     * @param fetchSize      the record size of queryed
-     * @throws SimpleConsumerLogicException
-     */
     public List<String> readData(String host, int port, String topic, int partition, int fetchSize)
             throws SimpleConsumerLogicException, UnsupportedEncodingException {
         SimpleConsumer simpleConsumer = null;
@@ -362,29 +257,20 @@ public class SimpleConsumerComponent {
         try {
             simpleConsumer = createSimpleSumer(host, port);
             result = readData(simpleConsumer, topic, partition, fetchSize);
-        }finally {
-            if (simpleConsumer != null){
+        } finally {
+            if (simpleConsumer != null) {
                 simpleConsumer.close();
             }
         }
         return result;
     }
 
-    /**
-     *
-     * @param simpleConsumer
-     * @param topic
-     * @param partition
-     * @param fetchSize
-     * @return
-     * @throws SimpleConsumerLogicException
-     * @throws UnsupportedEncodingException
-     */
-    public List<String> readData(SimpleConsumer simpleConsumer, String topic, int partition, int fetchSize)
+    public List<String> readData(SimpleConsumer simpleConsumer, String topic, int partition,
+                                 int fetchSize)
             throws SimpleConsumerLogicException, UnsupportedEncodingException {
         final ArrayList<String> result = new ArrayList<String>();
         final int entrySize = getEntrySize(simpleConsumer, topic, partition);
-        if (entrySize == 0){
+        if (entrySize == 0) {
             //throw new SimpleConsumerLogicException("empty data");
             return result;
         }
@@ -402,32 +288,24 @@ public class SimpleConsumerComponent {
             final ByteBuffer payload = messageAndOffset.message().payload();
             final byte[] bytes = new byte[payload.limit()];
             payload.get(bytes);
-            System.out.println(String.valueOf(messageAndOffset.offset()) + " : " + new String(bytes, "UTF-8"));
-            result.add(String.valueOf(messageAndOffset.offset()) + " : " + new String(bytes, "UTF-8"));
+            System.out.println(
+                    String.valueOf(messageAndOffset.offset()) + " : " + new String(bytes, "UTF-8"));
+            result.add(
+                    String.valueOf(messageAndOffset.offset()) + " : " + new String(bytes, "UTF-8"));
         }
-        if (result.size() <= fetchSize){
+        if (result.size() <= fetchSize) {
             return result;
         }
-        return result.subList(0,fetchSize);
+        return result.subList(0, fetchSize);
     }
 
-    /**
-     *   reqd data from broker by paginator
-     * @param simpleConsumer       connected to borker's consumer
-     * @param topic                one topic of searched
-     * @param partition            the partitions of topic
-     * @param startOffset          start position of searched
-     * @param fetchSize            the record size of queryed
-     * @throws SimpleConsumerLogicException
-     * @throws UnsupportedEncodingException
-     */
     public List<String> readDataForPage(SimpleConsumer simpleConsumer, String topic, int partition,
-                                int startOffset, int fetchSize)
+                                        int startOffset, int fetchSize)
             throws SimpleConsumerLogicException, UnsupportedEncodingException {
         final ArrayList<String> result = new ArrayList<String>();
         final int entrySize = getEntrySize(simpleConsumer, topic, partition);
         final FetchResponse fetchResponse = getFetchResponse(simpleConsumer, topic, partition,
-                startOffset, fetchSize  * entrySize);
+                startOffset, fetchSize * entrySize);
         long readOffset = getEarliestOffset(simpleConsumer, topic, partition);
 
         for (MessageAndOffset messageAndOffset : fetchResponse.messageSet(topic, partition)) {
@@ -441,27 +319,19 @@ public class SimpleConsumerComponent {
             final ByteBuffer payload = messageAndOffset.message().payload();
             final byte[] bytes = new byte[payload.limit()];
             payload.get(bytes);
-            result.add(String.valueOf(messageAndOffset.offset()) + " : " + new String(bytes, "UTF-8"));
+            result.add(
+                    String.valueOf(messageAndOffset.offset()) + " : " + new String(bytes, "UTF-8"));
         }
-        if (result.size() <= fetchSize){
+        if (result.size() <= fetchSize) {
             return result;
         }
-        return result.subList(0,fetchSize);
+        return result.subList(0, fetchSize);
     }
 
-    /**
-     *  get partition's leader connection
-     * @param host          active broker's host(ip/address)
-     * @param port          active broker's port
-     * @param topic         one topic of searched
-     * @param partition     the partitions of topic
-     * @return
-     * @throws SimpleConsumerLogicException
-     */
     public SimpleConsumer getLeaderSimpleConsumer(String host, int port, String topic,
                                                   int partition)
             throws SimpleConsumerLogicException {
-        final Partitions leader = getLeaderByTopicAndPartitions(host, port,
+        final Partitions leader = getLeaderByTopicAndPartition(host, port,
                 topic, partition).getPartitionses().get(0);
         if (leader == null) {
             throw new SimpleConsumerLogicException(
@@ -475,16 +345,6 @@ public class SimpleConsumerComponent {
         return simpleConsumer;
     }
 
-    /**
-     *  get fetch response from broker
-     * @param host            active broker's host(ip/address)
-     * @param port            active broker's port
-     * @param topic           one topic of searched
-     * @param partition       the partitions of topic
-     * @param fetchSize       the record size of queryed
-     * @return
-     * @throws SimpleConsumerLogicException
-     */
     private FetchResponse getFetchResponse(String host, int port, String topic, int partition,
                                            int fetchSize) throws SimpleConsumerLogicException {
         SimpleConsumer simpleConsumer = null;
@@ -500,15 +360,6 @@ public class SimpleConsumerComponent {
         return fetchResponse;
     }
 
-    /**
-     *
-     * @param simpleConsumer
-     * @param topic
-     * @param partition
-     * @param fetchSize
-     * @return
-     * @throws SimpleConsumerLogicException
-     */
     private FetchResponse getFetchResponse(SimpleConsumer simpleConsumer, String topic,
                                            int partition, int fetchSize)
             throws SimpleConsumerLogicException {
@@ -529,16 +380,6 @@ public class SimpleConsumerComponent {
 
     }
 
-    /**
-     *  get fetch response from broker
-     * @param simpleConsumer      connected to borker's consumer
-     * @param topic               one topic of searched
-     * @param partition           the partitions of topic
-     * @param startOffset         start position of searched
-     * @param fetchSize           the record size of queryed
-     * @return
-     * @throws SimpleConsumerLogicException
-     */
     private FetchResponse getFetchResponse(SimpleConsumer simpleConsumer, String topic,
                                            int partition, int startOffset, int fetchSize)
             throws SimpleConsumerLogicException {
@@ -561,14 +402,6 @@ public class SimpleConsumerComponent {
         return fetchResponse;
     }
 
-    /**
-     *
-     * @param simpleConsumer
-     * @param topic
-     * @param partition
-     * @return
-     * @throws SimpleConsumerLogicException
-     */
     private int getEntrySize(SimpleConsumer simpleConsumer, String topic, int partition)
             throws SimpleConsumerLogicException {
         final FetchResponse fetchResponse = getFetchResponse(simpleConsumer, topic, partition,
@@ -576,7 +409,7 @@ public class SimpleConsumerComponent {
         int maxEntrySize = 0;
         final Iterator<MessageAndOffset> iterator = fetchResponse.messageSet(topic, partition)
                 .iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             final MessageAndOffset messageAndOffset = iterator.next();
             final int entrySize = MessageSet.entrySize(messageAndOffset.message());
             maxEntrySize = entrySize > maxEntrySize ? entrySize : maxEntrySize;
@@ -584,15 +417,6 @@ public class SimpleConsumerComponent {
         return maxEntrySize;
     }
 
-    /**
-     *
-     * @param host
-     * @param port
-     * @param topic
-     * @param partition
-     * @return
-     * @throws SimpleConsumerLogicException
-     */
     private int getEntrySize(String host, int port, String topic, int partition)
             throws SimpleConsumerLogicException {
         final FetchResponse fetchResponse = getFetchResponse(host, port, topic, partition,
@@ -605,12 +429,6 @@ public class SimpleConsumerComponent {
         return 0;
     }
 
-    /**
-     *
-     * @param host
-     * @param port
-     * @return
-     */
     public SimpleConsumer createSimpleSumer(String host, int port) {
         return new SimpleConsumer(host, port, timeout,
                 bufferSize, clientName);
